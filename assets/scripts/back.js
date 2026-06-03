@@ -10,7 +10,7 @@ function createBackButton() {
   });
 
   const svgIcon = $('<img>', {
-    src: 'https://opaleyes.com/adb2c/assets/images/left-icon.svg',
+    src: 'https://prashanth-devp.github.io/ckY2gGCY9SZg/assets/images/left-icon.svg',
     alt: 'Back',
     css: {
       width: '14px',

@@ -13,7 +13,7 @@ function addEyeIconIntoPasswordField() {
     $passwordInput.css('paddingRight', '36px');
 
     const $eyeIcon = $('<img>', {
-      src: 'https://opaleyes.com/adb2c/assets/images/eye-off.svg',
+      src: 'https://prashanth-devp.github.io/ckY2gGCY9SZg/assets/images/eye-off.svg',
       alt: 'Toggle visibility',
     }).css({
       position: 'absolute',
@@ -34,8 +34,8 @@ function addEyeIconIntoPasswordField() {
       $eyeIcon.attr(
         'src',
         visible
-          ? 'https://opaleyes.com/adb2c/assets/images/eye.svg'
-          : 'https://opaleyes.com/adb2c/assets/images/eye-off.svg',
+          ? 'https://prashanth-devp.github.io/ckY2gGCY9SZg/assets/images/eye.svg'
+          : 'https://prashanth-devp.github.io/ckY2gGCY9SZg/assets/images/eye-off.svg',
       );
     });
 
