@@ -1,7 +1,7 @@
 $(document).ready(function () {
     window.CONTENT.verifying_blurb = "";
 
-    const intro = window.SA_FIELDS.AttributeFields[0].PAT_DESC;
+    const intro = window.SA_FIELDS?.AttributeFields?.[0]?.PAT_DESC;
 
     if (intro) {
         $(`<div class="intro">${intro}</div>'`)

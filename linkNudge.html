@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Link Your Account</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Rethink+Sans:ital,wght@0,400..800;1,400..800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="https://www.dev.opaleyes.com/adb2c/assets/css/common.css" />
+    <style>
+      body {
+        margin: 0;
+        font-family: "Rethink Sans", sans-serif;
+      }
+
+      #opal-main {
+        background-image: url("https://www.dev.opaleyes.com/adb2c/assets/images/landingBackground.png");
+        min-height: 100vh;
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+      }
+
+      header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 1rem 2rem;
+        background-color: white;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+      }
+
+      .headline {
+        margin: 2rem 0;
+        font-size: 40px;
+        line-height: 44px;
+        font-weight: 700;
+        text-align: center;
+        letter-spacing: -0.02em;
+        background: linear-gradient(95.65deg, #4593a7 0%, #359963 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        color: transparent;
+      }
+
+      .container {
+        background-color: white;
+        box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+        padding: 2rem 2rem 1.5rem 2rem;
+        max-width: 400px;
+        margin: 0 auto;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .nudge-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 56px;
+        height: 56px;
+        background: linear-gradient(135deg, #e8f4f7 0%, #e6f4ec 100%);
+        border-radius: 50%;
+        margin-bottom: 1.25rem;
+      }
+
+      .error {
+        color: #ef4444;
+        font-size: 0.875rem;
+        margin-top: 0.5rem;
+      }
+
+      /* B2C-injected heading/intro */
+      #api .heading h1 {
+        font-size: 1.5rem;
+        font-weight: 400;
+        margin: 0 0 0.25rem 0;
+      }
+
+      #api .intro h2 {
+        color: #6b7280;
+        font-size: 0.95em;
+        font-weight: normal;
+        margin: 0 0 1.5rem 0;
+      }
+
+      /* Hide B2C UI chrome we don't need */
+      #api .divider { display: none; }
+      #api .create  { display: none; }
+      #api #forgotPassword { display: none; }
+      #api a.helpLink.tiny { display: none; }
+      #api .options { display: none; }
+
+      /* Attribute list */
+      #api div#attributeList ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+      }
+
+      #api .attrEntry {
+        margin: 0 0 1.25rem 0;
+      }
+
+      /* "Don't show again" checkbox row */
+      #api .attrEntry {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-direction: row;
+      }
+
+      #api .attrEntry label {
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: #374151;
+        order: 2;
+        cursor: pointer;
+      }
+
+      #api .attrEntry .error {
+        flex-basis: 100%;
+        order: 3;
+      }
+
+      /* Custom checkbox styling */
+      :root {
+        --ctl-bg: #fff;
+        --ctl-border: #d1d5db;
+        --ctl-border-hover: #9ca3af;
+        --ctl-ring: #2F7D92;
+        --ctl-fill: #2F7D92;
+        --ctl-check: #fff;
+      }
+
+      input[type="checkbox"] {
+        appearance: none;
+        -webkit-appearance: none;
+        outline: none;
+        margin: 0;
+        order: 1;
+        flex-shrink: 0;
+        width: 20px;
+        height: 20px;
+        border-radius: 0.25rem;
+        border: 1.5px solid var(--ctl-border);
+        background-color: var(--ctl-bg);
+        cursor: pointer;
+        transition: border-color 0.15s, background-color 0.15s;
+        display: inline-grid;
+        place-content: center;
+      }
+
+      input[type="checkbox"]:hover { border-color: var(--ctl-border-hover); }
+
+      input[type="checkbox"]:focus-visible {
+        box-shadow: 0 0 0 2px #fff, 0 0 0 4px var(--ctl-ring);
+        border-color: var(--ctl-ring);
+      }
+
+      input[type="checkbox"]:checked {
+        background-color: var(--ctl-fill);
+        border-color: var(--ctl-fill);
+        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 16 16' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M4 8.5l2.5 2.5L12 5.5' stroke='%23fff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: center;
+        background-size: 12px 12px;
+      }
+
+      /* Button area — three-action nudge layout */
+      #api .buttons {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        margin-top: 1.5rem;
+      }
+
+      /* Primary: "Link now" (continue) */
+      #api button#continue {
+        width: 100%;
+        height: 56px;
+        background-color: rgb(47 125 146 / 1);
+        color: white;
+        font-weight: 700;
+        font-size: 1rem;
+        border: none;
+        cursor: pointer;
+        transition: background-color 0.2s ease-in-out;
+      }
+
+      #api button#continue:hover {
+        background-color: rgb(38 103 121 / 1);
+      }
+
+      /* Secondary: "Skip" (cancel) — outlined style */
+      #api button#cancel {
+        width: 100%;
+        height: 56px;
+        background-color: transparent;
+        color: rgb(47 125 146 / 1);
+        font-weight: 600;
+        font-size: 1rem;
+        border: 1.5px solid rgb(47 125 146 / 1);
+        cursor: pointer;
+        transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
+      }
+
+      #api button#cancel:hover {
+        background-color: rgb(47 125 146 / 0.06);
+      }
+
+      .flex { display: flex !important; }
+      .none { display: none !important; }
+    </style>
+  </head>
+  <body>
+    <div id="opal-main">
+      <header>
+        <img src="https://www.dev.opaleyes.com/adb2c/assets/images/logo.svg" alt="Logo" style="height: 1.5rem" />
+      </header>
+
+      <div class="p-4">
+        <h1 class="headline">See clearly, shop simply</h1>
+
+        <div class="container" role="presentation">
+          <!-- Link icon -->
+          <div class="nudge-icon" aria-hidden="true">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71" stroke="#2F7D92" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71" stroke="#2F7D92" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+
+          <!-- B2C injects heading, checkbox claim, and buttons here -->
+          <div id="api"></div>
+
+          <div id="error" class="error"></div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

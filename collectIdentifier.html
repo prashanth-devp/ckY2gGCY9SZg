@@ -13,10 +13,6 @@
           rel="stylesheet"
   />
   <link rel="stylesheet" href="https://www.dev.opaleyes.com/adb2c/assets/css/common.css" />
-  <script src="https://www.dev.opaleyes.com/adb2c/assets/scripts/verify-phone-code.js"></script>
-  <script src="https://www.dev.opaleyes.com/adb2c/assets/scripts/phone-number.js"></script>
-  <script src="https://www.dev.opaleyes.com/adb2c/assets/scripts/back.js"></script>
-  <script src="https://www.dev.opaleyes.com/adb2c/assets/scripts/shared.js"></script>
   <style>
     body {
       margin: 0;
@@ -57,7 +53,7 @@
     .container {
       background-color: white;
       box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
-      padding: 2rem 2rem 0.5rem 2rem;
+      padding: 2rem 2rem 1.5rem 2rem;
       max-width: 400px;
       margin: 0 auto;
       display: flex;
@@ -90,7 +86,7 @@
     input {
       width: 100%;
       border: none;
-      border-bottom: 1px solid #111827; /* Tailwind's gray-900 */
+      border-bottom: 1px solid #111827;
       background-color: transparent;
       font-size: 1rem;
       color: #111827;
@@ -116,7 +112,7 @@
       border: none;
       cursor: pointer;
       transition: background-color 0.2s ease-in-out;
-      height: 56px;
+      height: 58px;
     }
 
     .btn:hover {
@@ -156,35 +152,18 @@
       margin-top: 0.5rem;
     }
 
-    #api .heading h1{
+    #api .heading h1 {
       font-size: 1.5rem;
       font-weight: 400;
       margin: 0;
     }
 
-    #api .intro h2{
+    #api .intro h2 {
       color: #6b7280;
       margin-top: 0.25rem;
       font-size: 1em;
       font-weight: normal;
       margin-block-end: 1.5em;
-    }
-
-    #api .rememberMe {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      margin: 16px 0;
-    }
-
-    #api .rememberMe input {
-      width: auto;
-    }
-
-    #api .password-label {
-      display: flex;
-      gap: 6px;
-      align-items: center;
     }
 
     #api .entry-item {
@@ -203,19 +182,6 @@
       display: none;
     }
 
-    .flex {
-      display: flex !important;
-    }
-    .none {
-      display: none !important;
-    }
-
-    #api form#attributeVerification > .buttons {
-      display: none;
-      flex-direction: row-reverse;
-      gap: 6px;
-    }
-
     #api a.helpLink.tiny {
       display: none;
     }
@@ -229,28 +195,27 @@
       margin: 16px 0;
     }
 
-
-    #api .newPassword_li {
-      display: none;
-    }
-
-    #api .reenterPassword_li {
-      display: none;
-    }
-
     #api .buttons {
       display: flex;
       flex-direction: row-reverse;
       gap: 10px;
     }
 
-    #api .sendNewCode {
-      background: white;
-      color: #5A6A72;
-      border: 1px solid #5A6A72;
+    #api button#cancel {
+      display: none;
     }
 
+    .flex {
+      display: flex !important;
+    }
+    .none {
+      display: none !important;
+    }
   </style>
+  <script src="https://www.dev.opaleyes.com/adb2c/assets/scripts/collect-identifier.js" defer></script>
+  <script src="https://www.dev.opaleyes.com/adb2c/assets/scripts/common.js" defer></script>
+  <script src="https://www.dev.opaleyes.com/adb2c/assets/scripts/back.js"></script>
+  <script src="https://www.dev.opaleyes.com/adb2c/assets/scripts/shared.js"></script>
 </head>
 <body>
 <div id="opal-main">
@@ -267,10 +232,7 @@
 
     <!-- Login Box -->
     <div class="container unified_container" role="presentation">
-
       <div id="api"></div>
-
-      <!-- Errors area -->
       <div id="error" class="error"></div>
     </div>
   </div>

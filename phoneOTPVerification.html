@@ -13,9 +13,6 @@
           rel="stylesheet"
   />
   <link rel="stylesheet" href="https://www.dev.opaleyes.com/adb2c/assets/css/common.css" />
-  <script src="https://www.dev.opaleyes.com/adb2c/assets/scripts/verify-phone-code.js"></script>
-  <script src="https://www.dev.opaleyes.com/adb2c/assets/scripts/phone-number.js"></script>
-  <script src="https://www.dev.opaleyes.com/adb2c/assets/scripts/back.js"></script>
   <script src="https://www.dev.opaleyes.com/adb2c/assets/scripts/shared.js"></script>
   <style>
     body {
@@ -76,10 +73,6 @@
       margin-top: 6px;
     }
 
-    .input-wrapper {
-      margin-bottom: 1.5rem;
-    }
-
     label {
       display: block;
       font-size: 0.875rem;
@@ -90,7 +83,7 @@
     input {
       width: 100%;
       border: none;
-      border-bottom: 1px solid #111827; /* Tailwind's gray-900 */
+      border-bottom: 1px solid #111827;
       background-color: transparent;
       font-size: 1rem;
       color: #111827;
@@ -119,50 +112,19 @@
       height: 56px;
     }
 
-    .btn:hover {
-      background-color: rgb(47 125 146 / var(--tw-bg-opacity, 1));
-    }
-
-    .link {
-      color: rgb(47 125 146 / var(--tw-bg-opacity, 1));
-      font-weight: 500;
-      font-size: 0.875rem;
-      text-decoration: none;
-    }
-
-    .link:hover {
-      text-decoration: underline;
-    }
-
-    .separator {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 0.5rem;
-      margin: 1rem 0;
-      color: #9ca3af;
-      font-size: 0.875rem;
-    }
-
-    .separator hr {
-      flex: 1;
-      border: none;
-      border-top: 1px solid #d1d5db;
-    }
-
     .error {
       color: #ef4444;
       font-size: 0.875rem;
       margin-top: 0.5rem;
     }
 
-    #api .heading h1{
+    #api .heading h1 {
       font-size: 1.5rem;
       font-weight: 400;
       margin: 0;
     }
 
-    #api .intro h2{
+    #api .intro h2 {
       color: #6b7280;
       margin-top: 0.25rem;
       font-size: 1em;
@@ -170,72 +132,8 @@
       margin-block-end: 1.5em;
     }
 
-    #api .rememberMe {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      margin: 16px 0;
-    }
-
-    #api .rememberMe input {
-      width: auto;
-    }
-
-    #api .password-label {
-      display: flex;
-      gap: 6px;
-      align-items: center;
-    }
-
-    #api .entry-item {
-      margin-bottom: 16px;
-    }
-
-    #api .divider {
-      display: none;
-    }
-
-    #api .create {
-      display: none;
-    }
-
-    #api #forgotPassword {
-      display: none;
-    }
-
-    .flex {
-      display: flex !important;
-    }
-    .none {
-      display: none !important;
-    }
-
-    #api form#attributeVerification > .buttons {
-      display: none;
-      flex-direction: row-reverse;
-      gap: 6px;
-    }
-
-    #api a.helpLink.tiny {
-      display: none;
-    }
-
-    #api div#attributeList ul {
-      list-style: none;
-      padding: 0;
-    }
-
     #api .attrEntry {
       margin: 16px 0;
-    }
-
-
-    #api .newPassword_li {
-      display: none;
-    }
-
-    #api .reenterPassword_li {
-      display: none;
     }
 
     #api .buttons {
@@ -244,12 +142,27 @@
       gap: 10px;
     }
 
-    #api .sendNewCode {
-      background: white;
-      color: #5A6A72;
-      border: 1px solid #5A6A72;
+    #api a#cancel {
+      display: block;
+      margin-top: 1rem;
+      text-align: center;
+      color: rgb(47 125 146 / var(--tw-bg-opacity, 1));
+      font-size: 0.875rem;
+      font-weight: 500;
+      cursor: pointer;
+      text-decoration: none;
     }
 
+    #api a#cancel:hover {
+      text-decoration: underline;
+    }
+
+    .flex {
+      display: flex !important;
+    }
+    .none {
+      display: none !important;
+    }
   </style>
 </head>
 <body>
@@ -265,12 +178,8 @@
   <div class="p-4">
     <h1 class="headline">See clearly, shop simply</h1>
 
-    <!-- Login Box -->
     <div class="container unified_container" role="presentation">
-
       <div id="api"></div>
-
-      <!-- Errors area -->
       <div id="error" class="error"></div>
     </div>
   </div>

@@ -1,99 +1,125 @@
 $(document).ready(function () {
-    window.CONTENT.verifying_blurb = "";
+  window.CONTENT.verifying_blurb = '';
 
-    function waitForElementVisible(selector) {
-        return new Promise(resolve => {
-            if ($(selector).is(':visible')) {
-                resolve();
-                return;
-            }
+  var resendTimerInterval = null;
 
-            const observer = new MutationObserver((mutations, obs) => {
-                if ($(selector).is(':visible')) {
-                    obs.disconnect();
-                    resolve();
-                }
-            });
+  function startResendTimer() {
+    if (resendTimerInterval) clearInterval(resendTimerInterval);
 
-            observer.observe(document.body, {
-                childList: true,
-                subtree: true,
-                attributes: true,
-                attributeFilter: ['style', 'class']
-            });
-        });
+    var $btn = $('#phoneVerificationControl_but_send_new_code');
+    var label = $btn.text().replace(/\s*\(\d+s\)$/, '').trim() || 'Resend code';
+    var remaining = 60;
+
+    $btn.text(label + ' (' + remaining + 's)');
+    $btn.css({ 'pointer-events': 'none', 'opacity': '0.6' });
+
+    resendTimerInterval = setInterval(function () {
+      remaining--;
+      if (remaining <= 0) {
+        clearInterval(resendTimerInterval);
+        resendTimerInterval = null;
+        $btn.text(label);
+        $btn.css({ 'pointer-events': '', 'opacity': '' });
+      } else {
+        $btn.text(label + ' (' + remaining + 's)');
+      }
+    }, 1000);
+  }
+
+  function waitForElementVisible(selector) {
+    return new Promise((resolve) => {
+      if ($(selector).is(':visible')) {
+        resolve();
+        return;
+      }
+
+      const observer = new MutationObserver((mutations, obs) => {
+        if ($(selector).is(':visible')) {
+          obs.disconnect();
+          resolve();
+        }
+      });
+
+      observer.observe(document.body, {
+        childList: true,
+        subtree: true,
+        attributes: true,
+        attributeFilter: ['style', 'class'],
+      });
+    });
+  }
+
+  function waitForButtonEnabled(buttonId) {
+    return new Promise((resolve) => {
+      const button = document.getElementById(buttonId);
+
+      if (button && button.getAttribute('aria-disabled') === 'false') {
+        resolve(button);
+        return;
+      }
+
+      const observer = new MutationObserver((mutations, obs) => {
+        const button = document.getElementById(buttonId);
+        if (button && button.getAttribute('aria-disabled') === 'false') {
+          obs.disconnect();
+          resolve(button);
+        }
+      });
+
+      observer.observe(document.body, {
+        childList: true,
+        subtree: true,
+        attributes: true,
+        attributeFilter: ['aria-disabled'],
+      });
+    });
+  }
+
+  $('#phoneVerificationControl_but_send_code').on('click', async function () {
+    await waitForElementVisible('.verificationCode_li');
+
+    const introMessage = window?.SA_FIELDS.AttributeFields[0]?.DISPLAY_CONTROL_CONTENT?.intro_msg;
+    if (introMessage) {
+      $('#api h1').text(introMessage);
     }
 
-    function waitForButtonEnabled(buttonId) {
-        return new Promise(resolve => {
-            const button = document.getElementById(buttonId);
+    $('.phone_li').addClass('none');
+    $('.intro').addClass('none');
+    startResendTimer();
+  });
 
-            if (button && button.getAttribute('aria-disabled') === 'false') {
-                resolve(button);
-                return;
-            }
+  $('#phoneVerificationControl_but_send_new_code').on('click', function () {
+    startResendTimer();
+  });
 
-            const observer = new MutationObserver((mutations, obs) => {
-                const button = document.getElementById(buttonId);
-                if (button && button.getAttribute('aria-disabled') === 'false') {
-                    obs.disconnect();
-                    resolve(button);
-                }
-            });
+  $('#phoneVerificationControl_but_verify_code').on('click', async function () {
+    await waitForElementVisible('#phoneVerificationControl_but_change_claims');
 
-            observer.observe(document.body, {
-                childList: true,
-                subtree: true,
-                attributes: true,
-                attributeFilter: ['aria-disabled']
-            });
-        });
+    $('.phoneVerificationCode_li').addClass('none');
+    const rePassword = $('.reenterPassword_li');
+    const newPassword = $('.newPassword_li');
+    $('#phoneVerificationControl').addClass('none');
+
+    if (rePassword.length && newPassword.length) {
+      rePassword.show();
+      newPassword.show();
+      $('#attributeVerification > .buttons').addClass('flex');
     }
+  });
 
+  waitForElementVisible('#phoneVerificationControl_but_send_code').then(() => {
+    if ($('#phone').val().trim() !== '') {
+      $('#phoneVerificationControl_but_send_code').click();
+    }
+  });
 
-    $('#phoneVerificationControl_but_send_code').on('click', async function () {
-        console.log({beforeClickSendCode: 'clicking send code button'})
-        await waitForElementVisible('.verificationCode_li');
-        console.log({afterClickSendCode: 'code sent'})
-
-        const introMessage = window?.SA_FIELDS.AttributeFields[0]?.DISPLAY_CONTROL_CONTENT?.intro_msg
-        if(introMessage) {
-            $('#api h1').text(introMessage)
-        }
-
-        $('.phone_li').addClass('none');
-        $('.intro').addClass('none');
+  waitForButtonEnabled('continue').then((button) => {
+    $('#verifying_blurb').addClass('working');
+    setTimeout(() => {
+      button.click();
+    }, 0);
+    waitForElementVisible('#claimVerificationServerError').then(() => {
+      $('#verifying_blurb').removeClass('working');
     });
-
-    $('#phoneVerificationControl_but_verify_code').on('click', async function () {
-        await waitForElementVisible('#phoneVerificationControl_but_change_claims');
-
-        $('.phoneVerificationCode_li').addClass('none');
-        const rePassword = $('.reenterPassword_li');
-        const newPassword = $('.newPassword_li');
-        $('#phoneVerificationControl').addClass('none');
-
-        if (rePassword.length && newPassword.length) {
-            rePassword.show();
-            newPassword.show();
-            $('#attributeVerification > .buttons').addClass('flex');
-        }
-    });
-
-    waitForElementVisible('#phoneVerificationControl_but_send_code').then(() => {
-        if ($('#phone').val().trim() !== '') {
-            $('#phoneVerificationControl_but_send_code').click()
-        }
-    })
-
-    waitForButtonEnabled('continue').then(button => {
-        console.log({aaa: 'button enabled'})
-        $('#verifying_blurb').addClass('working')
-        setTimeout(() => {
-            button.click()
-        }, 0)
-        waitForElementVisible('#claimVerificationServerError').then(() => {
-            $('#verifying_blurb').removeClass('working')
-        })
-    });
+  });
 });
