@@ -139,7 +139,7 @@ function reorganizeOptions(socialSection, createAccount, forgotPassword, passwor
   forgotContainer.appendChild(forgotPassword);
 
   if (passwordlessExchange) {
-    passwordlessExchange.textContent = passwordlessExchange.textContent || 'Sign in with phone';
+    passwordlessExchange.textContent = passwordlessExchange.textContent || 'Login with one time password';
     const passwordlessContainer = document.createElement('div');
     passwordlessContainer.appendChild(passwordlessExchange);
     options.appendChild(passwordlessContainer);

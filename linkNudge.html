@@ -174,12 +174,16 @@
         background-size: 12px 12px;
       }
 
-      /* Button area — three-action nudge layout */
+      /* Button area — side-by-side layout: Skip (left, outlined) | Link (right, filled) */
       #api .buttons {
         display: flex;
-        flex-direction: column;
+        flex-direction: row-reverse;
         gap: 10px;
         margin-top: 1.5rem;
+      }
+
+      #api.buttons button {
+        flex: 1;
       }
 
       /* Primary: "Link now" (continue) */
@@ -227,7 +231,7 @@
       </header>
 
       <div class="p-4">
-        <h1 class="headline">See clearly, shop simply</h1>
+        <h1 class="headline">See clearly, shop simply with Opal</h1>
 
         <div class="container" role="presentation">
           <!-- Link icon -->
