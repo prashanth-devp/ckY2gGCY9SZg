@@ -51,6 +51,8 @@ $(document).ready(function () {
     }
 
     waitForInput(function (emailInput) {
+        emailInput.removeAttribute('pattern');
+
         $(emailInput).on('input', function () {
             if (isFormatting) return;
             var value = this.value;
