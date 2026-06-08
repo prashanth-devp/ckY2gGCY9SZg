@@ -117,16 +117,15 @@ $(document).ready(function () {
   $('#emailVerificationControl_but_verify_code').on('click', async function () {
     await waitForElement('#emailVerificationControl_but_change_claims');
 
-    $('#emailVerificationControl_success_message').hide();
-    $('.emailVerificationCode_li').addClass('none');
     const rePassword = $('.reenterPassword_li');
     const newPassword = $('.newPassword_li');
-    $('#emailVerificationControl').addClass('none');
-    $('.email_li').addClass('none');
-    $('#api').hide();
 
     if (rePassword.length && newPassword.length) {
-      $('#api').show();
+      $('#emailVerificationControl_success_message').hide();
+      $('.emailVerificationCode_li').addClass('none');
+      $('#emailVerificationControl').addClass('none');
+      $('.email_li').addClass('none');
+      $('#api h1').text('Add a password to your account');
       rePassword.show();
       newPassword.show();
       $('#attributeVerification > .buttons').css('display', 'flex');
