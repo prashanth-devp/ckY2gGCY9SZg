@@ -130,12 +130,12 @@ $(document).ready(function () {
       newPassword.show();
       $('#attributeVerification > .buttons').css('display', 'flex');
     } else {
-      $('.emailVerificationCode_li').addClass('none');
-      $('#emailVerificationControl_but_send_new_code').hide();
-      $('#emailVerificationControl_but_verify_code').hide();
-      $('#emailVerificationControl').addClass('none');
-      $('#attributeVerification > .buttons').css('display', 'flex');
-      $('#continue').show();
+      $('#api').hide();
+      $('.container').append('<div id="loading-indicator" style="text-align:center;padding:2rem;"><div class="spinner"></div></div>');
+      var continueBtn = document.getElementById('continue');
+      if (continueBtn) {
+        continueBtn.click();
+      }
     }
   });
 
