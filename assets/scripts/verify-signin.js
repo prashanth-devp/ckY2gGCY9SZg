@@ -130,6 +130,8 @@ $(document).ready(function () {
       newPassword.show();
       $('#attributeVerification > .buttons').css('display', 'flex');
     } else {
+      $('#api').hide();
+      $('.container').append('<div id="loading-indicator" style="text-align:center;padding:2rem;"><div class="spinner"></div></div>');
       var continueBtn = document.getElementById('continue');
       if (continueBtn) {
         continueBtn.click();
