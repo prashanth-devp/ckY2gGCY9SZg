@@ -40,6 +40,34 @@ $(document).ready(function () {
         input.dispatchEvent(new Event('change', { bubbles: true }));
     }
 
+    function suppressB2CPatternError() {
+        var observer = new MutationObserver(function () {
+            var $patternError = $('[id$="_pattern"]');
+            if ($patternError.length && $patternError.is(':visible')) {
+                var emailInput = document.getElementById('email');
+                if (emailInput && isPhoneInput(emailInput.value) && isValidPhone(emailInput.value)) {
+                    $patternError.hide();
+                }
+            }
+            var $errorItems = $('.error.itemLevel');
+            $errorItems.each(function () {
+                var text = $(this).text().toLowerCase();
+                if (text.indexOf('pattern') !== -1 || text.indexOf('valid email or phone') !== -1) {
+                    var emailInput = document.getElementById('email');
+                    if (emailInput && isPhoneInput(emailInput.value) && isValidPhone(emailInput.value)) {
+                        $(this).hide();
+                    }
+                }
+            });
+        });
+        observer.observe(document.body, {
+            childList: true,
+            subtree: true,
+            attributes: true,
+            attributeFilter: ['style', 'class']
+        });
+    }
+
     function waitForInput(callback) {
         var input = document.getElementById('email');
         if (input) { callback(input); return; }
@@ -52,6 +80,13 @@ $(document).ready(function () {
 
     waitForInput(function (emailInput) {
         emailInput.removeAttribute('pattern');
+
+        var patternObserver = new MutationObserver(function () {
+            if (emailInput.hasAttribute('pattern')) {
+                emailInput.removeAttribute('pattern');
+            }
+        });
+        patternObserver.observe(emailInput, { attributes: true, attributeFilter: ['pattern'] });
 
         $(emailInput).on('input', function () {
             if (isFormatting) return;
@@ -73,6 +108,8 @@ $(document).ready(function () {
             isFormatting = false;
         });
     });
+
+    suppressB2CPatternError();
 
     $('#continue').on('click', function (e) {
         clearError();
