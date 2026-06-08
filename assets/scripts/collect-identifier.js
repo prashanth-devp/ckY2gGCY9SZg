@@ -7,6 +7,9 @@ $(document).ready(function () {
 
     function isValidPhone(value) {
         var digits = value.replace(/\D/g, '');
+        if (digits.indexOf('1') === 0) {
+            digits = digits.slice(1);
+        }
         return digits.length === 10;
     }
 
@@ -54,7 +57,10 @@ $(document).ready(function () {
             if (!isPhoneInput(value)) return;
 
             var digits = value.replace(/\D/g, '');
-            var formatted = formatPhone(digits);
+            if (digits.length > 0 && digits.indexOf('1') === 0 && value.replace(/\s/g, '').indexOf('+1') === 0) {
+                digits = digits.slice(1);
+            }
+            var formatted = digits.length > 0 ? '+1 ' + formatPhone(digits) : '';
             if (this.value === formatted) return;
 
             isFormatting = true;
@@ -82,6 +88,9 @@ $(document).ready(function () {
                     return false;
                 }
                 var digits = value.replace(/\D/g, '');
+                if (digits.indexOf('1') === 0) {
+                    digits = digits.slice(1);
+                }
                 setNativeValue(emailInput, '+1' + digits);
             } else {
                 if (!isValidEmail(value)) {
