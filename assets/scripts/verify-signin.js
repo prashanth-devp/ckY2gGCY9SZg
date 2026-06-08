@@ -106,9 +106,10 @@ $(document).ready(function () {
       newPassword.show();
       $('#attributeVerification > .buttons').css('display', 'flex');
     } else {
-      waitForButtonEnabled('continue').then(function (btn) {
-        btn.click();
-      });
+      var continueBtn = document.getElementById('continue');
+      if (continueBtn) {
+        setTimeout(function () { continueBtn.click(); }, 200);
+      }
     }
   });
 

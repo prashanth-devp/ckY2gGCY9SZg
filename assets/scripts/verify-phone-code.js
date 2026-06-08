@@ -99,11 +99,17 @@ $(document).ready(function () {
     const rePassword = $('.reenterPassword_li');
     const newPassword = $('.newPassword_li');
     $('#phoneVerificationControl').addClass('none');
+    $('.phone_li').addClass('none');
 
     if (rePassword.length && newPassword.length) {
       rePassword.show();
       newPassword.show();
       $('#attributeVerification > .buttons').addClass('flex');
+    } else {
+      var continueBtn = document.getElementById('continue');
+      if (continueBtn) {
+        setTimeout(function () { continueBtn.click(); }, 200);
+      }
     }
   });
 
@@ -111,15 +117,5 @@ $(document).ready(function () {
     if ($('#phone').val().trim() !== '') {
       $('#phoneVerificationControl_but_send_code').click();
     }
-  });
-
-  waitForButtonEnabled('continue').then((button) => {
-    $('#verifying_blurb').addClass('working');
-    setTimeout(() => {
-      button.click();
-    }, 0);
-    waitForElementVisible('#claimVerificationServerError').then(() => {
-      $('#verifying_blurb').removeClass('working');
-    });
   });
 });
