@@ -114,6 +114,24 @@ $(document).ready(function () {
     startResendTimer();
   });
 
+  $('#emailVerificationControl_but_verify_code').on('click', async function () {
+    await waitForElement('#emailVerificationControl_success_message');
+
+    var rePassword = $('.reenterPassword_li');
+    var newPassword = $('.newPassword_li');
+
+    if (rePassword.length && newPassword.length) {
+      $('#emailVerificationControl_success_message').hide();
+      $('.emailVerificationCode_li').addClass('none');
+      $('#emailVerificationControl').addClass('none');
+      $('.email_li').addClass('none');
+      $('#api h1').text('Add a password to your account');
+      rePassword.show();
+      newPassword.show();
+      $('#attributeVerification > .buttons').css('display', 'flex');
+    }
+  });
+
   waitForButtonEnabled('continue').then((button) => {
     $('#api').hide();
     $('.container').append('<div id="loading-indicator" style="text-align:center;padding:2rem;"><div class="spinner"></div></div>');
