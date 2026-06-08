@@ -62,7 +62,8 @@ $(document).ready(function () {
             if (digits.length > 0 && digits.indexOf('1') === 0 && value.replace(/\s/g, '').indexOf('+1') === 0) {
                 digits = digits.slice(1);
             }
-            var formatted = digits.length > 0 ? '+1 ' + formatPhone(digits) : '';
+            digits = digits.slice(0, 10);
+            var formatted = digits.length > 0 ? '+1' + digits : '';
             if (this.value === formatted) return;
 
             isFormatting = true;
@@ -89,13 +90,6 @@ $(document).ready(function () {
                     showError('Please enter a valid 10-digit phone number.');
                     return false;
                 }
-                var digits = value.replace(/\D/g, '');
-                if (digits.indexOf('1') === 0) {
-                    digits = digits.slice(1);
-                }
-                isFormatting = true;
-                setNativeValue(emailInput, '+1' + digits);
-                isFormatting = false;
             } else {
                 if (!isValidEmail(value)) {
                     e.stopImmediatePropagation();
