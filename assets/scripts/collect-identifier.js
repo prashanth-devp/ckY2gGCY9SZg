@@ -91,7 +91,9 @@ $(document).ready(function () {
                 if (digits.indexOf('1') === 0) {
                     digits = digits.slice(1);
                 }
+                isFormatting = true;
                 setNativeValue(emailInput, '+1' + digits);
+                isFormatting = false;
             } else {
                 if (!isValidEmail(value)) {
                     e.stopImmediatePropagation();
