@@ -78,6 +78,7 @@ $(document).ready(function () {
   $('#phoneVerificationControl_but_send_code').on('click', async function () {
     await waitForElementVisible('.verificationCode_li');
 
+    $('#api').show();
     const introMessage = window?.SA_FIELDS.AttributeFields[0]?.DISPLAY_CONTROL_CONTENT?.intro_msg;
     if (introMessage) {
       $('#api h1').text(introMessage);
@@ -118,6 +119,7 @@ $(document).ready(function () {
 
   waitForElementVisible('#phoneVerificationControl_but_send_code').then(() => {
     if ($('#phone').val().trim() !== '') {
+      $('#api').hide();
       $('#phoneVerificationControl_but_send_code').click();
     }
   });
