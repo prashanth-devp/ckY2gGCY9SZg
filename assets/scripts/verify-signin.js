@@ -133,6 +133,23 @@ $(document).ready(function () {
   });
 
   waitForButtonEnabled('continue').then((button) => {
+    var rePassword = $('.reenterPassword_li');
+    var newPassword = $('.newPassword_li');
+
+    if (rePassword.length && newPassword.length) {
+      $('#emailVerificationControl_success_message').hide();
+      $('.emailVerificationCode_li').addClass('none');
+      $('#emailVerificationControl').addClass('none');
+      $('.email_li').addClass('none');
+      $('#api h1').text('Add a password to your account');
+      rePassword.show();
+      newPassword.show();
+      $('#attributeVerification > .buttons').css('display', 'flex');
+      $('#api').show();
+      $('#loading-indicator').remove();
+      return;
+    }
+
     $('#api').hide();
     $('.container').append('<div id="loading-indicator" style="text-align:center;padding:2rem;"><div class="spinner"></div></div>');
     setTimeout(function () {
@@ -146,6 +163,8 @@ $(document).ready(function () {
 
   waitForElementVisible('#emailVerificationControl_but_send_code').then(() => {
     if ($('#email').val().length) {
+      $('.email_li').addClass('none');
+      $('.intro').addClass('none');
       $('#api').hide();
       $('#emailVerificationControl_but_send_code').click();
     }
