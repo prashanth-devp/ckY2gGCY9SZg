@@ -114,29 +114,16 @@ $(document).ready(function () {
     startResendTimer();
   });
 
-  $('#emailVerificationControl_but_verify_code').on('click', async function () {
-    await waitForElement('#emailVerificationControl_but_change_claims');
-
-    const rePassword = $('.reenterPassword_li');
-    const newPassword = $('.newPassword_li');
-
-    if (rePassword.length && newPassword.length) {
-      $('#emailVerificationControl_success_message').hide();
-      $('.emailVerificationCode_li').addClass('none');
-      $('#emailVerificationControl').addClass('none');
-      $('.email_li').addClass('none');
-      $('#api h1').text('Add a password to your account');
-      rePassword.show();
-      newPassword.show();
-      $('#attributeVerification > .buttons').css('display', 'flex');
-    } else {
-      $('#api').hide();
-      $('.container').append('<div id="loading-indicator" style="text-align:center;padding:2rem;"><div class="spinner"></div></div>');
-      var continueBtn = document.getElementById('continue');
-      if (continueBtn) {
-        continueBtn.click();
-      }
-    }
+  waitForButtonEnabled('continue').then((button) => {
+    $('#api').hide();
+    $('.container').append('<div id="loading-indicator" style="text-align:center;padding:2rem;"><div class="spinner"></div></div>');
+    setTimeout(function () {
+      button.click();
+    }, 0);
+    waitForElementVisible('#claimVerificationServerError').then(function () {
+      $('#loading-indicator').remove();
+      $('#api').show();
+    });
   });
 
   waitForElementVisible('#emailVerificationControl_but_send_code').then(() => {
