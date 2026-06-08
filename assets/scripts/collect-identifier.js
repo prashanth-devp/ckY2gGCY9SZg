@@ -135,6 +135,6 @@ $(document).ready(function () {
                 }
             }
         }
-        $('#simplemodal-data #verifying_blurb').addClass('working');
+        $('#simplemodal-data #verifying_blurb').hide();
     });
 });
