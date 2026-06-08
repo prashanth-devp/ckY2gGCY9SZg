@@ -96,6 +96,51 @@ $(document).ready(function () {
     });
   }
 
+  function isEmailValue(value) {
+    return value && value.indexOf('@') > -1;
+  }
+
+  function handlePhoneVerificationSkip() {
+    var $phone = $('#phone');
+    var phoneValue = $phone.val();
+
+    if (isEmailValue(phoneValue)) {
+      $phone.val('');
+      $phone.trigger('input').trigger('change');
+      var phoneInput = $phone[0];
+      if (phoneInput) {
+        var nativeSetter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value').set;
+        nativeSetter.call(phoneInput, '');
+        phoneInput.dispatchEvent(new Event('input', { bubbles: true }));
+        phoneInput.dispatchEvent(new Event('change', { bubbles: true }));
+      }
+    }
+
+    $('.container').append('<div id="loading-indicator" style="text-align:center;padding:2rem;"><div class="spinner"></div></div>');
+
+    var skipTimeout = setTimeout(function () {
+      $('#loading-indicator').remove();
+      $('#api').show();
+    }, 5000);
+
+    waitForButtonEnabled('continue').then(function (button) {
+      clearTimeout(skipTimeout);
+      setTimeout(function () {
+        button.click();
+      }, 0);
+      waitForElementVisible('#claimVerificationServerError').then(function () {
+        $('#loading-indicator').remove();
+        $('#api').show();
+      });
+    });
+  }
+
+  waitForElement('#phoneVerificationControl_but_send_code').then(function () {
+    if (!document.getElementById('emailVerificationControl')) {
+      handlePhoneVerificationSkip();
+    }
+  });
+
   $('#emailVerificationControl_but_send_code').on('click', async function () {
     await waitForElementVisible('.verificationCode_li');
 
@@ -133,6 +178,10 @@ $(document).ready(function () {
   });
 
   waitForButtonEnabled('continue').then((button) => {
+    if (document.getElementById('phoneVerificationControl') && !document.getElementById('emailVerificationControl')) {
+      return;
+    }
+
     var rePassword = $('.reenterPassword_li');
     var newPassword = $('.newPassword_li');
 
