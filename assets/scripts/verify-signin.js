@@ -99,22 +99,17 @@ $(document).ready(function () {
     const rePassword = $('.reenterPassword_li');
     const newPassword = $('.newPassword_li');
     $('#emailVerificationControl').addClass('none');
+    $('.email_li').addClass('none');
 
     if (rePassword.length && newPassword.length) {
       rePassword.show();
       newPassword.show();
-      $('#attributeVerification > .buttons').addClass('flex');
+      $('#attributeVerification > .buttons').css('display', 'flex');
+    } else {
+      waitForButtonEnabled('continue').then(function (btn) {
+        btn.click();
+      });
     }
-  });
-
-  waitForButtonEnabled('continue').then((button) => {
-    $('#verifying_blurb').addClass('working');
-    setTimeout(() => {
-      button.click();
-    }, 0);
-    waitForElementVisible('#claimVerificationServerError').then(() => {
-      $('#verifying_blurb').removeClass('working');
-    });
   });
 
   waitForElementVisible('#emailVerificationControl_but_send_code').then(() => {
