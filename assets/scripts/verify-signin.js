@@ -95,20 +95,23 @@ $(document).ready(function () {
   $('#emailVerificationControl_but_verify_code').on('click', async function () {
     await waitForElementVisible('#emailVerificationControl_but_change_claims');
 
+    $('#emailVerificationControl_success_message').hide();
     $('.emailVerificationCode_li').addClass('none');
     const rePassword = $('.reenterPassword_li');
     const newPassword = $('.newPassword_li');
     $('#emailVerificationControl').addClass('none');
     $('.email_li').addClass('none');
+    $('#api').hide();
 
     if (rePassword.length && newPassword.length) {
+      $('#api').show();
       rePassword.show();
       newPassword.show();
       $('#attributeVerification > .buttons').css('display', 'flex');
     } else {
       var continueBtn = document.getElementById('continue');
       if (continueBtn) {
-        setTimeout(function () { continueBtn.click(); }, 200);
+        continueBtn.click();
       }
     }
   });
