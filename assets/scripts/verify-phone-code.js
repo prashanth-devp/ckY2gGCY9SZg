@@ -26,6 +26,27 @@ $(document).ready(function () {
     }, 1000);
   }
 
+  function waitForElement(selector) {
+    return new Promise((resolve) => {
+      if (document.querySelector(selector)) {
+        resolve();
+        return;
+      }
+
+      const observer = new MutationObserver((mutations, obs) => {
+        if (document.querySelector(selector)) {
+          obs.disconnect();
+          resolve();
+        }
+      });
+
+      observer.observe(document.body, {
+        childList: true,
+        subtree: true,
+      });
+    });
+  }
+
   function waitForElementVisible(selector) {
     return new Promise((resolve) => {
       if ($(selector).is(':visible')) {
@@ -94,7 +115,7 @@ $(document).ready(function () {
   });
 
   $('#phoneVerificationControl_but_verify_code').on('click', async function () {
-    await waitForElementVisible('#phoneVerificationControl_but_change_claims');
+    await waitForElement('#phoneVerificationControl_but_change_claims');
 
     $('#phoneVerificationControl_success_message').hide();
     $('.phoneVerificationCode_li').addClass('none');
