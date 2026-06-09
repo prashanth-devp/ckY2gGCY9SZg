@@ -96,4 +96,12 @@ $(document).ready(function () {
             button.click();
         }, 0);
     });
+
+    waitForElementVisible(SELECTORS.sendCodeButton).then(() => {
+        if ($('#email').val() && $('#email').val().length) {
+            $(SELECTORS.emailField).addClass('none');
+            $(SELECTORS.introText).addClass('none');
+            $(SELECTORS.sendCodeButton).click();
+        }
+    });
 });
