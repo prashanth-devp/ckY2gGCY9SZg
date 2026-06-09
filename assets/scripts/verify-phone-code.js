@@ -148,13 +148,49 @@ $(document).ready(function () {
     }, true);
   })();
 
+  function waitForVerificationResult() {
+    return new Promise(function (resolve) {
+      var successSelector = '#phoneVerificationControl_but_change_claims';
+      var errorSelector = '#phoneVerificationControl_error_message';
+
+      var observer = new MutationObserver(function () {
+        var successEl = document.querySelector(successSelector);
+        if (successEl && (successEl.style.display !== 'none')) {
+          observer.disconnect();
+          resolve('success');
+          return;
+        }
+
+        var errorEl = document.querySelector(errorSelector);
+        if (errorEl && errorEl.style.display !== 'none' && errorEl.textContent.trim()) {
+          observer.disconnect();
+          resolve('error');
+          return;
+        }
+      });
+
+      observer.observe(document.body, {
+        childList: true,
+        subtree: true,
+        attributes: true,
+        attributeFilter: ['style', 'class', 'aria-hidden'],
+      });
+    });
+  }
+
   $('#phoneVerificationControl_but_verify_code').on('click', async function () {
     var codeValue = $('#verificationCode').val();
     if (!codeValue || !codeValue.trim()) {
       return;
     }
 
-    await waitForElement('#phoneVerificationControl_but_change_claims');
+    var result = await waitForVerificationResult();
+
+    if (result === 'error') {
+      $('#phoneVerificationControl').removeClass('none');
+      $('.phoneVerificationCode_li').removeClass('none');
+      return;
+    }
 
     $('#phoneVerificationControl_success_message').hide();
     $('.phoneVerificationCode_li').addClass('none');
