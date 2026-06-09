@@ -220,10 +220,12 @@ $(document).ready(function () {
   });
 
   waitForElement('#emailVerificationControl').then(function () {
-    var $sendCode = $('#emailVerificationControl_but_send_code');
-    var $verifyCodeLi = $('.verificationCode_li');
+    var sendCodeEl = document.getElementById('emailVerificationControl_but_send_code');
+    var verifyCodeLi = document.querySelector('.verificationCode_li');
+    var sendCodeHidden = sendCodeEl && sendCodeEl.style.display === 'none';
+    var verifyCodeVisible = verifyCodeLi && verifyCodeLi.style.display !== 'none';
 
-    if ($verifyCodeLi.length && $verifyCodeLi.is(':visible') && !$sendCode.is(':visible')) {
+    if (verifyCodeVisible && sendCodeHidden) {
       $('.email_li').addClass('none');
       $('.intro').addClass('none');
       $('#api').show();
