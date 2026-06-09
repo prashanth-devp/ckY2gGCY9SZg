@@ -110,7 +110,17 @@ $(document).ready(function () {
   }
 
   $('#phoneVerificationControl_but_send_code').on('click', async function () {
-    await waitForElementVisible('.verificationCode_li');
+    var codeVisible = waitForElementVisible('.verificationCode_li');
+    var errorVisible = waitForElementVisible('#phoneVerificationControl_error_message');
+
+    var resolved = await Promise.race([
+      codeVisible.then(function () { return 'code'; }),
+      errorVisible.then(function () { return 'error'; }),
+    ]);
+
+    if (resolved === 'error') {
+      return;
+    }
 
     $('#api').show();
     const introMessage = window?.SA_FIELDS.AttributeFields[0]?.DISPLAY_CONTROL_CONTENT?.intro_msg;
