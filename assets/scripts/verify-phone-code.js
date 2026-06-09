@@ -219,6 +219,7 @@ $(document).ready(function () {
       if (continueBtn.getAttribute('aria-disabled') === 'true') {
         await waitForButtonEnabled('continue');
       }
+      $('#attributeVerification > .buttons').css('display', 'flex');
       continueBtn.click();
     }
   });
