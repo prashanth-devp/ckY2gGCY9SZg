@@ -127,6 +127,27 @@ $(document).ready(function () {
     startResendTimer();
   });
 
+  (function blockEmptyCodeVerify() {
+    document.addEventListener('click', function (e) {
+      var btn = document.getElementById('phoneVerificationControl_but_verify_code');
+      if (e.target === btn || (btn && btn.contains(e.target))) {
+        var codeInput = document.getElementById('verificationCode');
+        if (!codeInput || !codeInput.value.trim()) {
+          e.stopImmediatePropagation();
+          e.preventDefault();
+          var errorEl = codeInput
+            ? codeInput.closest('.attrEntry').querySelector('.error.itemLevel')
+            : null;
+          if (errorEl) {
+            errorEl.textContent = 'This field is required';
+            errorEl.classList.add('show');
+            errorEl.setAttribute('aria-hidden', 'false');
+          }
+        }
+      }
+    }, true);
+  })();
+
   $('#phoneVerificationControl_but_verify_code').on('click', async function () {
     var codeValue = $('#verificationCode').val();
     if (!codeValue || !codeValue.trim()) {
