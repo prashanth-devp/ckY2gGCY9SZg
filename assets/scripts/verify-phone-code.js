@@ -148,24 +148,41 @@ $(document).ready(function () {
     }, true);
   })();
 
+  function checkVerificationState() {
+    var changeBtn = document.getElementById('phoneVerificationControl_but_change_claims');
+    if (changeBtn && changeBtn.style.display !== 'none' && changeBtn.getAttribute('aria-hidden') !== 'true') {
+      return 'success';
+    }
+    var errorEl = document.getElementById('phoneVerificationControl_error_message');
+    if (errorEl && errorEl.style.display !== 'none' && errorEl.textContent.trim()) {
+      return 'error';
+    }
+    return null;
+  }
+
   function waitForVerificationResult() {
     return new Promise(function (resolve) {
-      var successSelector = '#phoneVerificationControl_but_change_claims';
-      var errorSelector = '#phoneVerificationControl_error_message';
+      var immediate = checkVerificationState();
+      if (immediate) {
+        resolve(immediate);
+        return;
+      }
+
+      var pollInterval = setInterval(function () {
+        var result = checkVerificationState();
+        if (result) {
+          clearInterval(pollInterval);
+          if (observer) observer.disconnect();
+          resolve(result);
+        }
+      }, 200);
 
       var observer = new MutationObserver(function () {
-        var successEl = document.querySelector(successSelector);
-        if (successEl && (successEl.style.display !== 'none')) {
+        var result = checkVerificationState();
+        if (result) {
+          clearInterval(pollInterval);
           observer.disconnect();
-          resolve('success');
-          return;
-        }
-
-        var errorEl = document.querySelector(errorSelector);
-        if (errorEl && errorEl.style.display !== 'none' && errorEl.textContent.trim()) {
-          observer.disconnect();
-          resolve('error');
-          return;
+          resolve(result);
         }
       });
 
@@ -199,6 +216,9 @@ $(document).ready(function () {
 
     var continueBtn = document.getElementById('continue');
     if (continueBtn) {
+      if (continueBtn.getAttribute('aria-disabled') === 'true') {
+        await waitForButtonEnabled('continue');
+      }
       continueBtn.click();
     }
   });
