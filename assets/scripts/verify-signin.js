@@ -205,14 +205,12 @@ $(document).ready(function () {
       return;
     }
 
-    $('#api').hide();
     $('.container').append('<div id="loading-indicator" style="text-align:center;padding:2rem;"><div class="spinner"></div></div>');
     setTimeout(function () {
       button.click();
     }, 0);
     waitForElementVisible('#claimVerificationServerError').then(function () {
       $('#loading-indicator').remove();
-      $('#api').show();
     });
   });
 
@@ -228,7 +226,6 @@ $(document).ready(function () {
       }
       $('.email_li').addClass('none');
       $('.intro').addClass('none');
-      $('#api').hide();
       $('#emailVerificationControl_but_send_code').click();
     }
   });
