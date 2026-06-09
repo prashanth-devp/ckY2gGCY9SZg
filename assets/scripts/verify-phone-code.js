@@ -128,6 +128,11 @@ $(document).ready(function () {
   });
 
   $('#phoneVerificationControl_but_verify_code').on('click', async function () {
+    var codeValue = $('#verificationCode').val();
+    if (!codeValue || !codeValue.trim()) {
+      return;
+    }
+
     await waitForElement('#phoneVerificationControl_but_change_claims');
 
     $('#phoneVerificationControl_success_message').hide();
