@@ -123,10 +123,8 @@ $(document).ready(function () {
     const newPassword = $('.newPassword_li');
     $('#phoneVerificationControl').addClass('none');
     $('.phone_li').addClass('none');
-    $('#api').hide();
 
     if (rePassword.length && newPassword.length) {
-      $('#api').show();
       rePassword.show();
       newPassword.show();
       $('#attributeVerification > .buttons').addClass('flex');
@@ -140,7 +138,6 @@ $(document).ready(function () {
 
   waitForElementVisible('#phoneVerificationControl_but_send_code').then(() => {
     if ($('#phone').val().trim() !== '') {
-      $('#api').hide();
       $('#phoneVerificationControl_but_send_code').click();
     }
   });
