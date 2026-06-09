@@ -219,6 +219,7 @@ $(document).ready(function () {
       if (continueBtn.getAttribute('aria-disabled') === 'true') {
         await waitForButtonEnabled('continue');
       }
+      await new Promise(function (r) { setTimeout(r, 1000); });
       $('#attributeVerification > .buttons').css('display', 'flex');
       continueBtn.click();
     }
