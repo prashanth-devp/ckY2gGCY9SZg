@@ -113,12 +113,12 @@ $(document).ready(function () {
     var codeVisible = waitForElementVisible('.verificationCode_li');
     var errorVisible = waitForElementVisible('#phoneVerificationControl_error_message');
 
-    var resolved = await Promise.race([
+    var result = await Promise.race([
       codeVisible.then(function () { return 'code'; }),
       errorVisible.then(function () { return 'error'; }),
     ]);
 
-    if (resolved === 'error') {
+    if (result === 'error') {
       return;
     }
 
