@@ -199,6 +199,9 @@ async function reorganizeLoginPage() {
     setupNextButtonHandler();
   } catch (error) {
     console.warn(error.message);
+    if (document.querySelector('#api[data-name="SelfAsserted"]')) {
+      document.getElementById('api').style.display = '';
+    }
   }
 }
 

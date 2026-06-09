@@ -218,4 +218,16 @@ $(document).ready(function () {
       $('#emailVerificationControl_but_send_code').click();
     }
   });
+
+  waitForElement('#emailVerificationControl').then(function () {
+    var $sendCode = $('#emailVerificationControl_but_send_code');
+    var $verifyCodeLi = $('.verificationCode_li');
+
+    if ($verifyCodeLi.length && $verifyCodeLi.is(':visible') && !$sendCode.is(':visible')) {
+      $('.email_li').addClass('none');
+      $('.intro').addClass('none');
+      $('#api').show();
+      startResendTimer();
+    }
+  });
 });
