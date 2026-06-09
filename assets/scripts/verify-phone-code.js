@@ -132,20 +132,12 @@ $(document).ready(function () {
 
     $('#phoneVerificationControl_success_message').hide();
     $('.phoneVerificationCode_li').addClass('none');
-    const rePassword = $('.reenterPassword_li');
-    const newPassword = $('.newPassword_li');
     $('#phoneVerificationControl').addClass('none');
     $('.phone_li').addClass('none');
 
-    if (rePassword.length && newPassword.length) {
-      rePassword.show();
-      newPassword.show();
-      $('#attributeVerification > .buttons').addClass('flex');
-    } else {
-      var continueBtn = document.getElementById('continue');
-      if (continueBtn) {
-        continueBtn.click();
-      }
+    var continueBtn = document.getElementById('continue');
+    if (continueBtn) {
+      continueBtn.click();
     }
   });
 
