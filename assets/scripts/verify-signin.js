@@ -218,6 +218,14 @@ $(document).ready(function () {
 
   waitForElementVisible('#emailVerificationControl_but_send_code').then(() => {
     if ($('#email').val().length) {
+      var verifyCodeLi = document.querySelector('.verificationCode_li');
+      if (verifyCodeLi && verifyCodeLi.style.display !== 'none') {
+        $('.email_li').addClass('none');
+        $('.intro').addClass('none');
+        $('#api').show();
+        startResendTimer();
+        return;
+      }
       $('.email_li').addClass('none');
       $('.intro').addClass('none');
       $('#api').hide();
