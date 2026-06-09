@@ -23,3 +23,7 @@
     background-position: center;
     animation: spin-ease 1s infinite;
 }
+
+#api .gaIdOpal_li {
+    display: none !important;
+}
