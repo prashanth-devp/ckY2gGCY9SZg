@@ -1,6 +1,19 @@
 $(document).ready(function () {
   window.CONTENT.verifying_blurb = '';
 
+  (function preventApiHide() {
+    var apiEl = document.getElementById('api');
+    if (!apiEl) return;
+
+    var observer = new MutationObserver(function () {
+      if (apiEl.style.display === 'none') {
+        apiEl.style.display = '';
+      }
+    });
+
+    observer.observe(apiEl, { attributes: true, attributeFilter: ['style'] });
+  })();
+
   var resendTimerInterval = null;
 
   function startResendTimer() {
