@@ -182,6 +182,12 @@ $(document).ready(function () {
       return;
     }
 
+    var sendCodeEl = document.getElementById('emailVerificationControl_but_send_code');
+    var verifyCodeLi = document.querySelector('.verificationCode_li');
+    if (verifyCodeLi && verifyCodeLi.style.display !== 'none' && sendCodeEl && sendCodeEl.style.display === 'none') {
+      return;
+    }
+
     var rePassword = $('.reenterPassword_li');
     var newPassword = $('.newPassword_li');
 
