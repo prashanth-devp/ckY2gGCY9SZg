@@ -101,7 +101,9 @@ $(document).ready(function () {
         if ($('#email').val() && $('#email').val().length) {
             $(SELECTORS.emailField).addClass('none');
             $(SELECTORS.introText).addClass('none');
-            $(SELECTORS.sendCodeButton).click();
+            setTimeout(function () {
+                $(SELECTORS.sendCodeButton).click();
+            }, 500);
         }
     });
 });

@@ -241,7 +241,9 @@ $(document).ready(function () {
       }
       $('.email_li').addClass('none');
       $('.intro').addClass('none');
-      $('#emailVerificationControl_but_send_code').click();
+      setTimeout(function () {
+        $('#emailVerificationControl_but_send_code').click();
+      }, 500);
     }
   });
 
