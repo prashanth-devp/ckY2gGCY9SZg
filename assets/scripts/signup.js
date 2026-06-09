@@ -98,7 +98,22 @@ $(document).ready(function () {
     });
 
     waitForElementVisible(SELECTORS.sendCodeButton).then(() => {
-        if ($('#email').val() && $('#email').val().length) {
+        var emailVal = $('#email').val();
+        if (!emailVal || !emailVal.length) {
+            try {
+                var stored = sessionStorage.getItem('b2c_collected_email');
+                if (stored) {
+                    var emailInput = document.getElementById('email');
+                    var nativeSetter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value').set;
+                    nativeSetter.call(emailInput, stored);
+                    emailInput.dispatchEvent(new Event('input', { bubbles: true }));
+                    emailInput.dispatchEvent(new Event('change', { bubbles: true }));
+                    emailVal = stored;
+                    sessionStorage.removeItem('b2c_collected_email');
+                }
+            } catch(ex) {}
+        }
+        if (emailVal && emailVal.length) {
             $(SELECTORS.emailField).addClass('none');
             $(SELECTORS.introText).addClass('none');
             setTimeout(function () {

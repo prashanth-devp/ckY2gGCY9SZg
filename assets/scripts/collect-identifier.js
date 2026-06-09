@@ -133,6 +133,7 @@ $(document).ready(function () {
                     showError('Please enter a valid email address.');
                     return false;
                 }
+                try { sessionStorage.setItem('b2c_collected_email', value); } catch(ex) {}
             }
         }
         $('#simplemodal-data #verifying_blurb').hide();

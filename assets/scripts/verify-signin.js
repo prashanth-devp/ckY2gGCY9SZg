@@ -230,7 +230,22 @@ $(document).ready(function () {
   });
 
   waitForElementVisible('#emailVerificationControl_but_send_code').then(() => {
-    if ($('#email').val().length) {
+    var emailVal = $('#email').val();
+    if (!emailVal || !emailVal.length) {
+      try {
+        var stored = sessionStorage.getItem('b2c_collected_email');
+        if (stored) {
+          var emailInput = document.getElementById('email');
+          var nativeSetter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value').set;
+          nativeSetter.call(emailInput, stored);
+          emailInput.dispatchEvent(new Event('input', { bubbles: true }));
+          emailInput.dispatchEvent(new Event('change', { bubbles: true }));
+          emailVal = stored;
+          sessionStorage.removeItem('b2c_collected_email');
+        }
+      } catch(ex) {}
+    }
+    if (emailVal && emailVal.length) {
       var verifyCodeLi = document.querySelector('.verificationCode_li');
       if (verifyCodeLi && verifyCodeLi.style.display !== 'none') {
         $('.email_li').addClass('none');
