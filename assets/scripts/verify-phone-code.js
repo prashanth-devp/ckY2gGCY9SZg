@@ -221,6 +221,11 @@ $(document).ready(function () {
       $('#attributeVerification > .buttons').css('display', 'flex');
       continueBtn.click();
       waitForElementVisible('#claimVerificationServerError').then(function () {
+        var $err = $('#claimVerificationServerError');
+        var errText = ($err.text() || '').toLowerCase();
+        if (errText.indexOf('already exists') !== -1 || errText.indexOf('specified id') !== -1) {
+          $err.text('An account already exists with this phone number.');
+        }
         $('#api').show();
         $('#phoneVerificationControl').removeClass('none');
         $('.phoneVerificationCode_li').removeClass('none');
