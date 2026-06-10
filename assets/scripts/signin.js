@@ -5,84 +5,6 @@ const config = {
   separatorText: "Don't have an account?",
 };
 
-function isPhoneValue(value) {
-  var trimmed = value.trim();
-  return trimmed.length > 0 && !trimmed.includes('@') && /\d/.test(trimmed);
-}
-
-function formatPhoneDisplay(raw) {
-  var digits = raw.replace(/\D/g, '');
-  if (digits.length > 10 && digits[0] === '1') digits = digits.slice(1);
-  digits = digits.slice(0, 10);
-  if (digits.length <= 3) return digits;
-  if (digits.length <= 6) return digits.slice(0, 3) + ' ' + digits.slice(3);
-  return digits.slice(0, 3) + ' ' + digits.slice(3, 6) + ' ' + digits.slice(6);
-}
-
-function toE164(displayValue) {
-  var digits = displayValue.replace(/\D/g, '');
-  if (digits.length === 11 && digits[0] === '1') digits = digits.slice(1);
-  return '+1' + digits.slice(0, 10);
-}
-
-function setupPhoneInput(input) {
-  if (!input) return;
-
-  input.placeholder = 'Enter email or phone number';
-
-  var wrapper = document.createElement('div');
-  wrapper.style.cssText = 'display: flex; align-items: center; border-bottom: 1px solid #111827;';
-
-  var prefix = document.createElement('span');
-  prefix.id = 'phone-prefix';
-  prefix.textContent = '+1';
-  prefix.style.cssText = 'font-size: 0.875rem; color: #5a6a72; padding: 1rem 0.25rem 1rem 1rem; display: none; white-space: nowrap;';
-
-  input.parentNode.insertBefore(wrapper, input);
-  wrapper.appendChild(prefix);
-  wrapper.appendChild(input);
-  input.style.borderBottom = 'none';
-
-  var storedE164 = '';
-
-  input.addEventListener('input', function () {
-    var val = this.value;
-    if (isPhoneValue(val)) {
-      prefix.style.display = '';
-      var formatted = formatPhoneDisplay(val);
-      storedE164 = toE164(val);
-      if (this.value !== formatted) this.value = formatted;
-      this.style.paddingLeft = '4px';
-    } else {
-      prefix.style.display = 'none';
-      storedE164 = '';
-      this.style.paddingLeft = '';
-    }
-  });
-
-  var nextBtn = document.getElementById('next');
-  if (nextBtn) {
-    nextBtn.addEventListener('click', function () {
-      if (storedE164) {
-        var nativeSetter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value').set;
-        nativeSetter.call(input, storedE164);
-        input.dispatchEvent(new Event('input', { bubbles: true }));
-        input.dispatchEvent(new Event('change', { bubbles: true }));
-      }
-    }, true);
-  }
-}
-
-function repositionErrorDiv() {
-  var apiEl = document.getElementById('api');
-  var errorEl = document.getElementById('error');
-  if (!apiEl || !errorEl) return;
-  var firstEntry = apiEl.querySelector('.entry-item, .attrEntry');
-  if (firstEntry) {
-    apiEl.insertBefore(errorEl, firstEntry);
-  }
-}
-
 function addRequiredSign() {
   if (!window.SA_FIELDS || !window.SA_FIELDS.AttributeFields) return;
   window.SA_FIELDS.AttributeFields.forEach((block) => {
@@ -114,7 +36,6 @@ function waitForElements() {
         divider: document.querySelector('.divider'),
         socialSection: document.querySelector('.claims-provider-list-buttons.social'),
         next: document.getElementById('next'),
-        signInInput: document.getElementById('signInName') || document.getElementById('email'),
       };
 
       const requiredElements = ['forgotPassword', 'createAccount', 'form', 'isLoginPage', 'next'];
@@ -243,8 +164,6 @@ async function reorganizeLoginPage() {
     reorganizeOptions(elements.socialSection, elements.createAccount, elements.forgotPassword);
     removeSocialIntro(elements.socialSection);
     setupNextButtonHandler();
-    setupPhoneInput(elements.signInInput);
-    repositionErrorDiv();
   } catch (error) {
     console.warn(error.message);
   }
