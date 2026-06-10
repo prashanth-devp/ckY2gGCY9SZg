@@ -179,6 +179,24 @@
 
     <div class="container unified_container" role="presentation">
       <div id="api"></div>
+
+      <!-- Secondary button — triggers passwordless flow -->
+      <button 
+        id="btn-passwordless" 
+        onclick="navigateTo('passwordless')"
+        style="width:100%; height:56px; background:white; border:1px solid #d1d5db; 
+              color:#111827; font-weight:500; cursor:pointer; margin-top:8px;">
+        Login with one time password
+      </button>
+
+      <!-- Sign up link -->
+      <div style="text-align:center; margin-top:1.5rem; color:#6b7280; font-size:0.875rem;">
+        Don't have an account? 
+        <a href="#" onclick="navigateTo('sign_up')" 
+          style="color:#2f7d92; font-weight:600; text-decoration:none;">
+          Sign up
+        </a>
+      </div>
       <div id="error" class="error"></div>
     </div>
   </div>
