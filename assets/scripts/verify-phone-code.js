@@ -87,14 +87,14 @@ $(document).ready(function () {
     return new Promise((resolve) => {
       const button = document.getElementById(buttonId);
 
-      if (button && button.getAttribute('aria-disabled') === 'false') {
+      if (button && button.getAttribute('aria-disabled') !== 'true' && !button.disabled) {
         resolve(button);
         return;
       }
 
       const observer = new MutationObserver((mutations, obs) => {
         const button = document.getElementById(buttonId);
-        if (button && button.getAttribute('aria-disabled') === 'false') {
+        if (button && button.getAttribute('aria-disabled') !== 'true' && !button.disabled) {
           obs.disconnect();
           resolve(button);
         }
@@ -104,23 +104,13 @@ $(document).ready(function () {
         childList: true,
         subtree: true,
         attributes: true,
-        attributeFilter: ['aria-disabled'],
+        attributeFilter: ['aria-disabled', 'disabled'],
       });
     });
   }
 
   $('#phoneVerificationControl_but_send_code').on('click', async function () {
-    var codeVisible = waitForElementVisible('.verificationCode_li');
-    var errorVisible = waitForElementVisible('#phoneVerificationControl_error_message');
-
-    var result = await Promise.race([
-      codeVisible.then(function () { return 'code'; }),
-      errorVisible.then(function () { return 'error'; }),
-    ]);
-
-    if (result === 'error') {
-      return;
-    }
+    await waitForElementVisible('.verificationCode_li');
 
     $('#api').show();
     const introMessage = window?.SA_FIELDS.AttributeFields[0]?.DISPLAY_CONTROL_CONTENT?.intro_msg;
@@ -226,9 +216,7 @@ $(document).ready(function () {
 
     var continueBtn = document.getElementById('continue');
     if (continueBtn) {
-      if (continueBtn.getAttribute('aria-disabled') === 'true') {
-        await waitForButtonEnabled('continue');
-      }
+      await waitForButtonEnabled('continue');
       await new Promise(function (r) { setTimeout(r, 1000); });
       $('#attributeVerification > .buttons').css('display', 'flex');
       continueBtn.click();
