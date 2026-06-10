@@ -118,7 +118,7 @@ function waitForElements() {
       };
     }
 
-    const requiredElements = ['forgotPassword', 'createAccount', 'form', 'isLoginPage', 'next'];
+    const requiredElements = ['forgotPassword', 'form', 'isLoginPage', 'next'];
 
     const elements = getElements();
     const allElementsFound = requiredElements.every((key) => elements[key]);
@@ -194,7 +194,7 @@ function removeDivider(divider) {
 
 function styleAuthLinks(forgotPassword, createAccount) {
   forgotPassword.classList.add('link');
-  createAccount.classList.add('link');
+  if (createAccount) createAccount.classList.add('link');
 }
 
 function moveSocialSection(form, socialSection) {
@@ -207,13 +207,6 @@ function reorganizeOptions(socialSection, createAccount, forgotPassword, passwor
 
   options.innerHTML = '';
 
-  const signUpContainer = document.createElement('div');
-  signUpContainer.appendChild(createAccount);
-
-  const separatorContainer = document.createElement('div');
-  separatorContainer.className = 'separator';
-  separatorContainer.innerHTML = `<hr />${config.separatorText}<hr />`;
-
   const forgotContainer = document.createElement('div');
   forgotContainer.appendChild(forgotPassword);
 
@@ -225,8 +218,19 @@ function reorganizeOptions(socialSection, createAccount, forgotPassword, passwor
   }
 
   options.appendChild(forgotContainer);
-  options.appendChild(separatorContainer);
-  options.appendChild(signUpContainer);
+
+  if (createAccount) {
+    const separatorContainer = document.createElement('div');
+    separatorContainer.className = 'separator';
+    separatorContainer.innerHTML = `<hr />${config.separatorText}<hr />`;
+
+    const signUpContainer = document.createElement('div');
+    signUpContainer.appendChild(createAccount);
+
+    options.appendChild(separatorContainer);
+    options.appendChild(signUpContainer);
+  }
+
   options.style = 'display: block;';
 }
 
