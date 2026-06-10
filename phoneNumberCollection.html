@@ -184,30 +184,5 @@
   </div>
 </div>
 
-<script>
-  function waitForElement(selector) {
-    return new Promise(function (resolve) {
-      var el = document.querySelector(selector);
-      if (el) { resolve(el); return; }
-      var observer = new MutationObserver(function (mutations, obs) {
-        var el = document.querySelector(selector);
-        if (el) { obs.disconnect(); resolve(el); }
-      });
-      observer.observe(document.body, { childList: true, subtree: true });
-    });
-  }
-
-  waitForElement('.heading h1').then(function (el) {
-    el.textContent = 'Enter your phone number';
-  });
-
-  waitForElement('.intro h2').then(function (el) {
-    el.textContent = "We’ll send a one-time code to verify your number.";
-  });
-
-  waitForElement('label[for="phoneNumber"]').then(function (el) {
-    el.textContent = 'Phone number*';
-  });
-</script>
 </body>
 </html>
