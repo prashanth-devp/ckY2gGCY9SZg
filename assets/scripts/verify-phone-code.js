@@ -220,6 +220,12 @@ $(document).ready(function () {
       await new Promise(function (r) { setTimeout(r, 1000); });
       $('#attributeVerification > .buttons').css('display', 'flex');
       continueBtn.click();
+      waitForElementVisible('#claimVerificationServerError').then(function () {
+        $('#api').show();
+        $('#phoneVerificationControl').removeClass('none');
+        $('.phoneVerificationCode_li').removeClass('none');
+        $('.phone_li').removeClass('none');
+      });
     }
   });
 
