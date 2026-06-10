@@ -1,17 +1,17 @@
-function waitForInputEnabled(inputId) {
+function waitForInputEnabled(inputIds) {
+    const ids = Array.isArray(inputIds) ? inputIds : [inputIds];
     return new Promise(resolve => {
-        const input = document.getElementById(inputId);
-
-        if (input) {
-            resolve(input);
+        const found = ids.map(id => document.getElementById(id)).find(Boolean);
+        if (found) {
+            resolve(found);
             return;
         }
 
         const observer = new MutationObserver((mutations, obs) => {
-            const input = document.getElementById(inputId);
-            if (input) {
+            const found = ids.map(id => document.getElementById(id)).find(Boolean);
+            if (found) {
                 obs.disconnect();
-                resolve(input);
+                resolve(found);
             }
         });
 
@@ -25,8 +25,8 @@ function waitForInputEnabled(inputId) {
 }
 
 $(document).ready(async function () {
-    // Get the original phone input
-    const originalPhoneInput = await waitForInputEnabled('phone');
+    // Handle both 'phone' (MFA control pages) and 'phoneNumber' (collection page)
+    const originalPhoneInput = await waitForInputEnabled(['phone', 'phoneNumber']);
 
     if(!originalPhoneInput) {
         return
