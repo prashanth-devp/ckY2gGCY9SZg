@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Login</title>
 
+  <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link
@@ -13,6 +14,7 @@
   />
   <link rel="stylesheet" href="https://prashanth-devp.github.io/ckY2gGCY9SZg/assets/css/common.css" />
   <script src="https://prashanth-devp.github.io/ckY2gGCY9SZg/assets/scripts/shared.js"></script>
+  <script src="https://prashanth-devp.github.io/ckY2gGCY9SZg/assets/scripts/phone-number.js"></script>
   <style>
     body {
       margin: 0;
@@ -105,13 +107,21 @@
       margin-top: 0.5rem;
     }
 
-    #api .heading h1 {
+    #api .heading {
+      display: none;
+    }
+
+    #api .intro {
+      display: none;
+    }
+
+    .static-heading {
       font-size: 1.5rem;
       font-weight: 400;
       margin: 0;
     }
 
-    #api .intro h2 {
+    .static-subtext {
       color: #6b7280;
       margin-top: 0.25rem;
       font-size: 1em;
@@ -140,6 +150,7 @@
       display: none;
     }
 
+    /* Hide ADB2C "What is this?" tooltip link */
     #api a.helpLink.tiny {
       display: none;
     }
@@ -157,63 +168,8 @@
     .flex {
       display: flex !important;
     }
-
     .none {
       display: none !important;
-    }
-
-    /* Secondary button */
-    #btn-passwordless {
-      width: 100%;
-      height: 56px;
-      background-color: white;
-      color: #2f7d92;
-      font-family: "Rethink Sans", sans-serif;
-      font-size: 1rem;
-      font-weight: 500;
-      border: 1.5px solid #2f7d92;
-      cursor: pointer;
-      margin-top: 8px;
-      transition: background-color 0.2s ease-in-out;
-    }
-
-    #btn-passwordless:hover {
-      background-color: #f0f9fb;
-    }
-
-    /* Divider with "Don't have an account?" */
-    .signup-divider {
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-      margin: 1.25rem 0 0.75rem 0;
-      color: #6b7280;
-      font-size: 0.875rem;
-    }
-
-    .signup-divider::before,
-    .signup-divider::after {
-      content: "";
-      flex: 1;
-      height: 1px;
-      background-color: #d1d5db;
-    }
-
-    /* Sign up link */
-    .signup-link {
-      text-align: center;
-      margin-bottom: 1.25rem;
-    }
-
-    .signup-link a {
-      color: #2f7d92;
-      font-weight: 700;
-      font-size: 1rem;
-      text-decoration: none;
-    }
-
-    .signup-link a:hover {
-      text-decoration: underline;
     }
   </style>
 </head>
@@ -231,21 +187,23 @@
     <h1 class="headline">See clearly, shop simply</h1>
 
     <div class="container unified_container" role="presentation">
+      <h1 class="static-heading">Welcome back!</h1>
+      <p class="static-subtext">Enter your phone number to login</p>
       <div id="api"></div>
-
-      <button id="btn-passwordless">
-        Login with one time password
-      </button>
-
-      <div class="signup-divider">Don't have an account?</div>
-
-      <div class="signup-link">
-        <a href="#" id="btn-signup">Sign up</a>
-      </div>
-
       <div id="error" class="error"></div>
     </div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        var continueBtn = document.getElementById("continue");
+        if (continueBtn) {
+          continueBtn.value = "Send verification code";
+        }
+      });
+    </script>
   </div>
 </div>
+
+
 </body>
 </html>
