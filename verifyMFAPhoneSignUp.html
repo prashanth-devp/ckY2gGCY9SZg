@@ -13,7 +13,7 @@
           rel="stylesheet"
   />
   <link rel="stylesheet" href="https://prashanth-devp.github.io/ckY2gGCY9SZg/assets/css/common.css" />
-  <script src="https://prashanth-devp.github.io/ckY2gGCY9SZg/assets/scripts/verify-phone-code.js"></script>
+  <script src="https://prashanth-devp.github.io/ckY2gGCY9SZg/assets/scripts/verify-phone-code-signup.js"></script>
   <script src="https://prashanth-devp.github.io/ckY2gGCY9SZg/assets/scripts/back.js"></script>
   <script src="https://prashanth-devp.github.io/ckY2gGCY9SZg/assets/scripts/shared.js"></script>
   <style>
@@ -200,11 +200,13 @@
       display: none !important;
     }
 
-    #api #phoneVerificationControl_success_message {
+   /* The sign-up control id is "phoneVerificationControl.CustomOTP", so the emitted
+       element ids contain a dot and must be escaped in the selector. */
+    #api #phoneVerificationControl\.CustomOTP_success_message {
       display: none !important;
     }
 
-    #api #phoneVerificationControl_but_change_claims {
+    #api #phoneVerificationControl\.CustomOTP_but_change_claims {
       display: none !important;
     }
 
