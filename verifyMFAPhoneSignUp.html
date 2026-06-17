@@ -12,11 +12,11 @@
           href="https://fonts.googleapis.com/css2?family=Rethink+Sans:ital,wght@0,400..800;1,400..800&display=swap"
           rel="stylesheet"
   />
-  <link rel="stylesheet" href="https://prashanth-devp.github.io/ckY2gGCY9SZg/css/common.css" />
-  <script src="https://prashanth-devp.github.io/ckY2gGCY9SZg/scripts/verify-phone-code.js"></script>
-  <script src="https://prashanth-devp.github.io/ckY2gGCY9SZg/scripts/phone-number.js"></script>
-  <script src="https://prashanth-devp.github.io/ckY2gGCY9SZg/scripts/back.js"></script>
-  <script src="https://prashanth-devp.github.io/ckY2gGCY9SZg/scripts/shared.js"></script>
+  <link rel="stylesheet" href="https://prashanth-devp.github.io/ckY2gGCY9SZg/assets/css/common.css" />
+  <script src="https://prashanth-devp.github.io/ckY2gGCY9SZg/assets/scripts/verify-phone-code.js"></script>
+  <script src="https://prashanth-devp.github.io/ckY2gGCY9SZg/assets/scripts/phone-number.js"></script>
+  <script src="https://prashanth-devp.github.io/ckY2gGCY9SZg/assets/scripts/back.js"></script>
+  <script src="https://prashanth-devp.github.io/ckY2gGCY9SZg/assets/scripts/shared.js"></script>
   <style>
     body {
       margin: 0;
@@ -24,7 +24,7 @@
     }
 
     #opal-main {
-      background-image: url("https://prashanth-devp.github.io/ckY2gGCY9SZg/images/landingBackground.png");
+      background-image: url("https://prashanth-devp.github.io/ckY2gGCY9SZg/assets/images/landingBackground.png");
       height: 100vh;
       background-size: cover;
       background-position: center;
@@ -46,8 +46,8 @@
       line-height: 44px;
       font-weight: 700;
       text-align: center;
-      letter-spacing: -0.8px;
-      background: linear-gradient(142.57deg, #4593a7 0%, #359963 100%);
+      letter-spacing: -0.02em;
+      background: linear-gradient(95.65deg, #4593a7 0%, #359963 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
@@ -57,8 +57,8 @@
     .container {
       background-color: white;
       box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
-      padding: 32px;
-      max-width: 470px;
+      padding: 2rem 2rem 0.5rem 2rem;
+      max-width: 400px;
       margin: 0 auto;
       display: flex;
       flex-direction: column;
@@ -82,27 +82,25 @@
 
     label {
       display: block;
-      font-size: 14px;
-      line-height: 20px;
+      font-size: 0.875rem;
       font-weight: 500;
-      color: #1a1a1a;
+      color: #111827;
     }
 
     input {
       width: 100%;
       border: none;
-      border-bottom: 1px solid #1a1a1a;
+      border-bottom: 1px solid #111827;
       background-color: transparent;
-      font-size: 16px;
-      line-height: 24px;
-      color: #1a1a1a;
+      font-size: 1rem;
+      color: #111827;
       box-sizing: border-box;
-      padding: 16px;
+      padding: 1rem;
     }
 
     input::placeholder {
-      color: #b3b3b3;
-      font-size: 16px;
+      color: #9ca3af;
+      font-size: 1rem;
     }
 
     input:focus {
@@ -111,15 +109,14 @@
 
     #api button {
       width: 100%;
-      background-color: #2f7d92;
+      background-color: rgb(47 125 146 / var(--tw-bg-opacity, 1));
       color: white;
       font-weight: 700;
-      font-size: 16px;
-      line-height: 24px;
-      padding: 16px 32px;
+      padding: 0.75rem;
       border: none;
       cursor: pointer;
       transition: background-color 0.2s ease-in-out;
+      height: 56px;
     }
 
     .btn:hover {
@@ -160,21 +157,17 @@
     }
 
     #api .heading h1 {
-      font-size: 22px;
-      line-height: 24px;
-      font-weight: 500;
-      letter-spacing: -0.385px;
-      color: #1a1a1a;
+      font-size: 1.5rem;
+      font-weight: 400;
       margin: 0;
     }
 
     #api .intro h2 {
-      color: #5a6a72;
-      margin-top: 0.5rem;
-      font-size: 16px;
-      line-height: 24px;
+      color: #6b7280;
+      margin-top: 0.25rem;
+      font-size: 1em;
       font-weight: normal;
-      margin-block-end: 2rem;
+      margin-block-end: 1.5em;
     }
 
     #api .entry-item {
@@ -207,7 +200,6 @@
     #api #verifying_blurb {
       display: none !important;
     }
-
     #api #phoneVerificationControl_success_message {
       display: none !important;
     }
@@ -245,20 +237,31 @@
 
     #api .buttons {
       display: flex;
-      flex-direction: column;
-      gap: 16px;
-      width: 100%;
+      flex-direction: row-reverse;
+      gap: 10px;
     }
 
-    /* Resend code rendered as a borderless teal text button, per design. */
     #api .sendNewCode {
       background: white;
-      color: #2f7d92;
-      border: none;
-      font-weight: 700;
-      font-size: 16px;
-      line-height: 24px;
-      padding: 8px;
+      color: #5A6A72;
+      border: 1px solid #5A6A72;
+    }
+
+    @keyframes spin-ease {
+      0% { transform: rotate(0deg); animation-timing-function: ease-in; }
+      50% { transform: rotate(180deg); animation-timing-function: ease-out; }
+      100% { transform: rotate(360deg); }
+    }
+
+    .spinner {
+      margin: 0 auto;
+      width: 35px;
+      height: 30px;
+      background-image: url(data:image/svg+xml;base64,PHN2ZyBhcmlhLWhpZGRlbj0idHJ1ZSIgdmlld0JveD0iMCAwIDEwMCAxMDEiIGZpbGw9Im5vbmUiCiAgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8ZGVmcz4KICAgIDxsaW5lYXJHcmFkaWVudCBpZD0iZ3JhZGllbnQiIHgxPSIwJSIgeTE9IjAlIiB4Mj0iMTAwJSIgeTI9IjAlIj4KICAgICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3R5bGU9InN0b3AtY29sb3I6IHJnYmEoMCwgMTU0LCAxNjYsIDApIiAvPgogICAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0eWxlPSJzdG9wLWNvbG9yOiByZ2JhKDAsIDE1NCwgMTY2LCAxKSIgLz4KICAgIDwvbGluZWFyR3JhZGllbnQ+CiAgPC9kZWZzPgogIDxjaXJjbGUgY3g9IjUwIiBjeT0iNTAuNSIgcj0iNDUiIHN0cm9rZT0iI2Q2ZWZmNSIgc3Ryb2tlLXdpZHRoPSIxMCIgLz4KICA8Y2lyY2xlIGN4PSI1MCIgY3k9IjUwLjUiIHI9IjQ1IiBmaWxsPSJ0cmFuc3BhcmVudCIgLz4KICA8cGF0aCBkPSJNOTMuOTY3NiAzOS4wNDA5Qzk2LjM5MyAzOC40MDM4IDk3Ljg2MjQgMzUuOTExNiA5Ny4wMDc5IDMzLjU1MzlDOTUuMjkzMiAyOC44MjI3IDkyLjg3MSAyNC4zNjkyIDg5LjgxNjcgMjAuMzQ4Qzg1Ljg0NTIgMTUuMTE5MiA4MC44ODI2IDEwLjcyMzggNzUuMjEyNCA3LjQxMjg5QzY5LjU0MjIgNC4xMDE5NCA2My4yNzU0IDEuOTQwMjUgNTYuNzY5OCAxLjA1MTI0QzUxLjc2NjYgMC4zNjc1NDEgNDYuNjk3NiAwLjQ0Njg0MyA0MS43MzQ1IDEuMjc4NzNDMzkuMjYxMyAxLjY5MzI4IDM3LjgxMyA0LjE5Nzc4IDM4LjQ1MDEgNi42MjMyNkMzOS4wODczIDkuMDQ4NzQgNDEuNTY5NCAxMC40NzE3IDQ0LjA1MDUgMTAuMTA3MUM0Ny44NTExIDkuNTQ4NTUgNTEuNzE5MSA5LjUyNjg5IDU1LjU0MDIgMTAuMDQ5MUM2MC44NjQyIDEwLjc3NjYgNjUuOTkyOCAxMi41NDU3IDcwLjYzMzEgMTUuMjU1MkM3NS4yNzM1IDE3Ljk2NDggNzkuMzM0NyAyMS41NjE5IDgyLjU4NDkgMjUuODQxQzg0LjkxNzUgMjguOTEyMSA4Ni43OTk3IDMyLjI5MTMgODguMTgxMSAzNS44NzU4Qzg5LjA4MyAzOC4yMTU4IDkxLjU0MjEgMzkuNjc4MSA5My45Njc2IDM5LjA0MDlaIiBmaWxsPSJ1cmwoI2dyYWRpZW50KSIgLz4KPC9zdmc+);
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-position: center;
+      animation: spin-ease 1s infinite;
     }
 
   </style>
@@ -267,14 +270,14 @@
 <div id="opal-main">
   <header>
     <img
-            src="https://prashanth-devp.github.io/ckY2gGCY9SZg/images/logo.svg"
+            src="https://prashanth-devp.github.io/ckY2gGCY9SZg/assets/images/logo.svg"
             alt="Logo"
             style="height: 1.5rem"
     />
   </header>
 
   <div class="p-4">
-    <h1 class="headline">See clearly, shop simply with Opal</h1>
+    <h1 class="headline">See clearly, shop simply</h1>
 
     <!-- Login Box -->
     <div class="container unified_container" role="presentation">
