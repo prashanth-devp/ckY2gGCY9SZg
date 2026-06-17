@@ -3,22 +3,21 @@
 // This is the sign-up counterpart to verify-phone-code.js. The sign-in page uses
 // the Azure-MFA VerificationControl whose DisplayControl Id is "phoneVerificationControl"
 // (claims: phone / verificationCode). The sign-up page uses the custom REST OTP
-// VerificationControl whose DisplayControl Id is "phoneVerificationControl.CustomOTP"
-// (claims: phoneNumberReadOnly / otpCode).
+// VerificationControl "phoneVerificationControlCustomOtp" (claims: phoneNumberReadOnly /
+// otpCode), backed by REST-SendSMSOTP / REST-ValidateSMSOTP.
 //
-// Because the control Id contains a dot, Azure B2C emits element ids like
-// "phoneVerificationControl.CustomOTP_but_send_code". The shared verify-phone-code.js
-// is hardcoded to the "phoneVerificationControl" prefix and the "phone"/"verificationCode"
-// claim ids, so none of its selectors match here — the auto "Send code" never fires
-// (no OTP is sent) and the raw control buttons stay visible. This file mirrors the
-// proven sign-in logic but targets the .CustomOTP control's ids.
+// NOTE: the control id must stay dot-free. B2C derives its own element ids from the
+// control id (e.g. "<id>_but_send_code") and selects them without escaping, so a dotted
+// id (a previous "phoneVerificationControl.CustomOTP") broke B2C's native button wiring —
+// SendCode never fired and every button stayed visible. This file mirrors the proven
+// sign-in logic, retargeted to this control's claim ids.
 $(document).ready(function () {
   window.CONTENT.verifying_blurb = '';
 
-  // Sign-up control specifics. CTRL_ESC escapes the dot for CSS/jQuery selectors;
-  // getElementById is used with the raw (unescaped) id where convenient.
-  var CTRL = 'phoneVerificationControl.CustomOTP';
-  var CTRL_ESC = 'phoneVerificationControl\\.CustomOTP';
+  // Sign-up control specifics. CTRL_ESC mirrors CTRL (the id is dot-free, nothing to escape)
+  // and is kept so selector strings read the same as the sign-in script.
+  var CTRL = 'phoneVerificationControlCustomOtp';
+  var CTRL_ESC = 'phoneVerificationControlCustomOtp';
   var CODE_INPUT_ID = 'otpCode';
   var CODE_LI = '.otpCode_li';
   var PHONE_LI = '.phoneNumberReadOnly_li';
