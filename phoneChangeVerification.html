@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Enter verification code</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Rethink+Sans:ital,wght@0,400..800;1,400..800&display=swap"
+    rel="stylesheet"
+  />
+  <link rel="stylesheet" href="https://prashanth-devp.github.io/ckY2gGCY9SZg/assets/css/common.css" />
+  <script src="https://prashanth-devp.github.io/ckY2gGCY9SZg/assets/scripts/shared.js"></script>
+  <style>
+    body {
+      margin: 0;
+      font-family: "Rethink Sans", sans-serif;
+    }
+
+    #opal-main {
+      background-image: url("https://prashanth-devp.github.io/ckY2gGCY9SZg/assets/images/landingBackground.png");
+      height: 100vh;
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem 2rem;
+      background-color: white;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    }
+
+    .headline {
+      margin: 2rem 0;
+      font-size: 40px;
+      line-height: 44px;
+      font-weight: 700;
+      text-align: center;
+      letter-spacing: -0.02em;
+      background: linear-gradient(95.65deg, #4593a7 0%, #359963 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .container {
+      background-color: white;
+      padding: 32px;
+      max-width: 470px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 32px;
+    }
+
+    .back-link {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      text-decoration: none;
+      color: #1a1a1a;
+      font-size: 14px;
+      font-weight: 500;
+      line-height: 20px;
+    }
+
+    .back-link:hover {
+      text-decoration: underline;
+    }
+
+    .back-link svg {
+      width: 16px;
+      height: 16px;
+    }
+
+    label {
+      display: block;
+      font-size: 14px;
+      font-weight: 500;
+      color: #1a1a1a;
+      line-height: 20px;
+    }
+
+    input {
+      width: 100%;
+      border: none;
+      border-bottom: 1px solid #1a1a1a;
+      background-color: transparent;
+      font-size: 16px;
+      font-family: "Rethink Sans", sans-serif;
+      color: #1a1a1a;
+      box-sizing: border-box;
+      padding: 16px;
+      line-height: 24px;
+      height: 56px;
+    }
+
+    input::placeholder {
+      color: #b3b3b3;
+      font-size: 16px;
+    }
+
+    input:focus {
+      outline: none;
+      border-bottom-color: #2f7d92;
+    }
+
+    #api .heading h1 {
+      font-size: 22px;
+      font-weight: 500;
+      color: #1a1a1a;
+      letter-spacing: -0.385px;
+      margin: 0;
+      line-height: 24px;
+    }
+
+    #api .intro h2 {
+      font-size: 16px;
+      font-weight: 400;
+      color: #5a6a72;
+      margin: 16px 0 0 0;
+      line-height: 24px;
+    }
+
+    #api .entry-item {
+      margin-bottom: 16px;
+    }
+
+    #api .attrEntry {
+      margin: 0;
+    }
+
+    #api div#attributeList ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    #api li.TextBox:first-child .attrEntry {
+      display: none;
+    }
+
+    #api .buttons {
+      margin-top: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    #api button#continue {
+      width: 100%;
+      height: 56px;
+      background-color: #2f7d92;
+      color: white;
+      font-family: "Rethink Sans", sans-serif;
+      font-size: 16px;
+      font-weight: 700;
+      padding: 16px 32px;
+      border: none;
+      cursor: pointer;
+      transition: background-color 0.2s ease-in-out;
+      line-height: 24px;
+    }
+
+    #api button#continue:hover {
+      background-color: #256a7c;
+    }
+
+    #api button#cancel {
+      display: none;
+    }
+
+    .resend-code-link {
+      display: block;
+      margin-top: 16px;
+      text-align: center;
+      color: #2f7d92;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      text-decoration: none;
+      padding: 8px;
+      background: white;
+      border: none;
+      font-family: "Rethink Sans", sans-serif;
+      width: 100%;
+      line-height: 24px;
+    }
+
+    .resend-code-link:hover {
+      text-decoration: underline;
+    }
+
+    #api .divider {
+      display: none;
+    }
+
+    #api .create {
+      display: none;
+    }
+
+    #api a.helpLink.tiny {
+      display: none;
+    }
+
+    .error {
+      color: #ef4444;
+      font-size: 14px;
+      margin-top: 8px;
+    }
+
+    #api .error.itemLevel {
+      color: #ef4444;
+      font-size: 14px;
+      margin-top: 4px;
+    }
+
+    #api .error.pageLevel {
+      color: #ef4444;
+      font-size: 14px;
+      margin-bottom: 16px;
+    }
+
+    .flex {
+      display: flex !important;
+    }
+
+    .none {
+      display: none !important;
+    }
+  </style>
+</head>
+<body>
+<div id="opal-main">
+  <header>
+    <img
+      src="https://prashanth-devp.github.io/ckY2gGCY9SZg/assets/images/logo.svg"
+      alt="Logo"
+      style="height: 1.5rem"
+    />
+  </header>
+
+  <div class="p-4">
+    <h1 class="headline">See clearly, shop simply with Opal</h1>
+
+    <div class="container" role="presentation">
+      <a class="back-link" id="back-link" href="javascript:void(0)">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M10.828 12l4.95 4.95-1.414 1.414L8 12l6.364-6.364 1.414 1.414z"/>
+        </svg>
+        <span>Back</span>
+      </a>
+      <div id="api"></div>
+      <button class="resend-code-link" id="resend-code-btn">Resend code</button>
+    </div>
+  </div>
+</div>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    var backLink = document.getElementById("back-link");
+    var resendBtn = document.getElementById("resend-code-btn");
+
+    if (backLink) {
+      backLink.addEventListener("click", function (e) {
+        e.preventDefault();
+        var cancelBtn = document.getElementById("cancel");
+        if (cancelBtn) {
+          cancelBtn.click();
+        }
+      });
+    }
+
+    if (resendBtn) {
+      resendBtn.addEventListener("click", function (e) {
+        e.preventDefault();
+        var cancelBtn = document.getElementById("cancel");
+        if (cancelBtn) {
+          cancelBtn.click();
+        }
+      });
+    }
+  });
+</script>
+</body>
+</html>
