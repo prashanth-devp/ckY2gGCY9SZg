@@ -1,318 +1,321 @@
 <!doctype html>
 <html lang="en">
-	<head>
-		<meta charset="UTF-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<title>Confirm your phone number</title>
+ <head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Confirm your phone number</title>
 
-		<link rel="preconnect" href="https://fonts.googleapis.com" />
-		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-		<link
-			href="https://fonts.googleapis.com/css2?family=Rethink+Sans:ital,wght@0,400..800;1,400..800&display=swap"
-			rel="stylesheet" />
-		<link
-			rel="stylesheet"
-			href="https://prashanth-devp.github.io/ckY2gGCY9SZg/assets/css/common.css" />
-		<script src="https://prashanth-devp.github.io/ckY2gGCY9SZg/assets/scripts/shared.js"></script>
-		<style>
-			body {
-				margin: 0;
-				font-family: "Rethink Sans", sans-serif;
-			}
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+   href="https://fonts.googleapis.com/css2?family=Rethink+Sans:ital,wght@0,400..800;1,400..800&display=swap"
+   rel="stylesheet" />
+  <link
+   rel="stylesheet"
+   href="https://prashanth-devp.github.io/ckY2gGCY9SZg/assets/css/common.css" />
+  <script src="https://prashanth-devp.github.io/ckY2gGCY9SZg/assets/scripts/shared.js"></script>
+  <style>
+   body {
+    margin: 0;
+    font-family: "Rethink Sans", sans-serif;
+   }
 
-			#opal-main {
-				background-image: url("https://prashanth-devp.github.io/ckY2gGCY9SZg/assets/images/landingBackground.png");
-				height: 100vh;
-				background-size: cover;
-				background-position: center;
-				background-repeat: no-repeat;
-			}
+   #opal-main {
+    background-image: url("https://prashanth-devp.github.io/ckY2gGCY9SZg/assets/images/landingBackground.png");
+    height: 100vh;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+   }
 
-			header {
-				display: flex;
-				align-items: center;
-				justify-content: space-between;
-				padding: 1rem 2rem;
-				background-color: white;
-				box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-			}
+   header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 2rem;
+    background-color: white;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+   }
 
-			.headline {
-				margin: 2rem 0;
-				font-size: 40px;
-				line-height: 44px;
-				font-weight: 700;
-				text-align: center;
-				letter-spacing: -0.02em;
-				background: linear-gradient(95.65deg, #4593a7 0%, #359963 100%);
-				-webkit-background-clip: text;
-				-webkit-text-fill-color: transparent;
-				background-clip: text;
-				color: transparent;
-			}
+   .headline {
+    margin: 2rem 0;
+    font-size: 40px;
+    line-height: 44px;
+    font-weight: 700;
+    text-align: center;
+    letter-spacing: -0.02em;
+    background: linear-gradient(95.65deg, #4593a7 0%, #359963 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    color: transparent;
+   }
 
-			.container {
-				background-color: white;
-				padding: 32px;
-				max-width: 470px;
-				margin: 0 auto;
-				display: flex;
-				flex-direction: column;
-				gap: 48px;
-			}
+   .container {
+    background-color: white;
+    padding: 32px;
+    max-width: 470px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 48px;
+   }
 
-			label {
-				display: block;
-				font-size: 14px;
-				font-weight: 500;
-				color: #1a1a1a;
-				line-height: 20px;
-			}
+   label {
+    display: block;
+    font-size: 14px;
+    font-weight: 500;
+    color: #1a1a1a;
+    line-height: 20px;
+   }
 
-			input {
-				width: 100%;
-				border: none;
-				border-bottom: 1px solid #1a1a1a;
-				background-color: transparent;
-				font-size: 16px;
-				font-family: "Rethink Sans", sans-serif;
-				color: #1a1a1a;
-				box-sizing: border-box;
-				padding: 8px 12px;
-				line-height: 24px;
-				height: 40px;
-			}
+   input {
+    width: 100%;
+    border: none;
+    border-bottom: 1px solid #1a1a1a;
+    background-color: transparent;
+    font-size: 16px;
+    font-family: "Rethink Sans", sans-serif;
+    color: #1a1a1a;
+    box-sizing: border-box;
+    padding: 8px 12px;
+    line-height: 24px;
+    height: 40px;
+   }
 
-			input::placeholder {
-				color: #b3b3b3;
-				font-size: 16px;
-			}
+   input::placeholder {
+    color: #b3b3b3;
+    font-size: 16px;
+   }
 
-			input:focus {
-				outline: none;
-				border-bottom-color: #2f7d92;
-			}
+   input:focus {
+    outline: none;
+    border-bottom-color: #2f7d92;
+   }
 
-			#api .heading h1 {
-				font-size: 22px;
-				font-weight: 500;
-				color: #1a1a1a;
-				letter-spacing: -0.385px;
-				margin: 0;
-				line-height: 24px;
-			}
+   #api .heading h1 {
+    font-size: 22px;
+    font-weight: 500;
+    color: #1a1a1a;
+    letter-spacing: -0.385px;
+    margin: 0;
+    line-height: 24px;
+   }
 
-			#api .intro h2 {
-				font-size: 18px;
-				font-weight: 400;
-				color: #5a6a72;
-				margin: 8px 0 0 0;
-				line-height: 24px;
-				letter-spacing: 0.135px;
-			}
+   #api .intro h2 {
+    font-size: 18px;
+    font-weight: 400;
+    color: #5a6a72;
+    margin: 8px 0 0 0;
+    line-height: 24px;
+    letter-spacing: 0.135px;
+   }
 
-			#api .entry-item {
-				margin-bottom: 16px;
-			}
+   #api .entry-item {
+    margin-bottom: 16px;
+   }
 
-			#api .attrEntry {
-				margin: 0;
-			}
+   #api .attrEntry {
+    margin: 0;
+   }
 
-			#api div#attributeList ul {
-				list-style: none;
-				padding: 0;
-				margin: 0;
-			}
+   #api div#attributeList ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+   }
 
-			#api .buttons {
-				margin-top: 28px;
-			}
+   #api .buttons {
+    margin-top: 28px;
+   }
 
-			#api button#continue {
-				width: 100%;
-				height: 56px;
-				background-color: #2f7d92;
-				color: white;
-				font-family: "Rethink Sans", sans-serif;
-				font-size: 16px;
-				font-weight: 700;
-				padding: 16px 32px;
-				border: none;
-				cursor: pointer;
-				transition: background-color 0.2s ease-in-out;
-				line-height: 24px;
-			}
+   #api button#continue {
+    width: 100%;
+    height: 56px;
+    background-color: #2f7d92;
+    color: white;
+    font-family: "Rethink Sans", sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    padding: 16px 32px;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.2s ease-in-out;
+    line-height: 24px;
+   }
 
-			#api button#continue:hover {
-				background-color: #256a7c;
-			}
+   #api button#continue:hover {
+    background-color: #256a7c;
+   }
 
-			#api button#cancel {
-				display: none;
-			}
+   #api button#cancel {
+    display: none;
+   }
 
-			#api .divider {
-				display: none;
-			}
+   #api .divider {
+    display: none;
+   }
 
-			#api .create {
-				display: none;
-			}
+   #api .create {
+    display: none;
+   }
 
-			#api a.helpLink.tiny {
-				display: none;
-			}
+   #api a.helpLink.tiny {
+    display: none;
+   }
 
-			.error {
-				color: #ef4444;
-				font-size: 14px;
-				margin-top: 8px;
-			}
+   .error {
+    color: #ef4444;
+    font-size: 14px;
+    margin-top: 8px;
+   }
 
-			#api .error.itemLevel {
-				color: #ef4444;
-				font-size: 14px;
-				margin-top: 4px;
-			}
+   #api .error.itemLevel {
+    color: #ef4444;
+    font-size: 14px;
+    margin-top: 4px;
+   }
 
-			#api .error.pageLevel {
-				color: #ef4444;
-				font-size: 14px;
-				margin-bottom: 16px;
-			}
+   #api .error.pageLevel {
+    color: #ef4444;
+    font-size: 14px;
+    margin-bottom: 16px;
+   }
 
-			.flex {
-				display: flex !important;
-			}
+   .flex {
+    display: flex !important;
+   }
 
-			.none {
-				display: none !important;
-			}
-		</style>
-	</head>
-	<body>
-		<div id="opal-main">
-			<header>
-				<img
-					src="https://prashanth-devp.github.io/ckY2gGCY9SZg/assets/images/logo.svg"
-					alt="Logo"
-					style="height: 1.5rem" />
-			</header>
+   .none {
+    display: none !important;
+   }
+  </style>
+ </head>
+ <body>
+  <div id="opal-main">
+   <header>
+    <img
+     src="https://prashanth-devp.github.io/ckY2gGCY9SZg/assets/images/logo.svg"
+     alt="Logo"
+     style="height: 1.5rem" />
+   </header>
 
-			<div class="p-4">
-				<h1 class="headline">See clearly, shop simply with Opal</h1>
+   <div class="p-4">
+    <h1 class="headline">See clearly, shop simply with Opal</h1>
 
-				<div class="container" role="presentation">
-					<div id="api"></div>
-				</div>
-			</div>
-		</div>
+    <div class="container" role="presentation">
+     <div id="api"></div>
+    </div>
+   </div>
+  </div>
 
-		<script>
-			(function () {
-				var PREFIX = "+1";
-				var MAX_DIGITS = 10;
-				var PHONE_PATTERN = /^\+1\d{10}$/;
-				var ERROR_TEXT = "Enter a valid 10-digit US phone number";
-				var ERROR_ID = "newPhone-blur-error";
+  <script>
+   (function () {
+    var PREFIX = "+1";
+    var MAX_DIGITS = 10;
+    var PHONE_PATTERN = /^\+1\d{10}$/;
+    var ERROR_TEXT = "Enter a valid 10-digit US phone number";
+    var ERROR_ID = "newPhone-blur-error";
 
-				function getInput() {
-					return document.getElementById("newPhone");
-				}
+    function getInput() {
+     return document.getElementById("newPhone");
+    }
 
-				// Keep only the 10 subscriber digits, dropping a leading US country code
-				// digit if the value arrived as +1XXXXXXXXXX (e.g. the prepopulated hint).
-				function extractDigits(value) {
-					var digits = (value || "").replace(/\D/g, "");
-					if (digits.length > MAX_DIGITS && digits.charAt(0) === "1") {
-						digits = digits.slice(1);
-					}
-					return digits.slice(0, MAX_DIGITS);
-				}
+    // Keep only the 10 subscriber digits, dropping a leading US country code
+    // digit if the value arrived as +1XXXXXXXXXX (e.g. the prepopulated hint).
+    function extractDigits(value) {
+     var digits = (value || "").replace(/\D/g, "");
+     if (digits.length > MAX_DIGITS && digits.charAt(0) === "1") {
+      digits = digits.slice(1);
+     }
+     return digits.slice(0, MAX_DIGITS);
+    }
 
-				function getErrorEl(input) {
-					var el = document.getElementById(ERROR_ID);
-					if (!el) {
-						el = document.createElement("div");
-						el.id = ERROR_ID;
-						el.className = "error itemLevel";
-						el.setAttribute("role", "alert");
-						el.style.display = "none";
-						input.parentNode.insertBefore(el, input.nextSibling);
-					}
-					return el;
-				}
+    function getErrorEl(input) {
+     var el = document.getElementById(ERROR_ID);
+     if (!el) {
+      el = document.createElement("div");
+      el.id = ERROR_ID;
+      el.className = "error itemLevel";
+      el.setAttribute("role", "alert");
+      el.style.display = "none";
+      input.parentNode.insertBefore(el, input.nextSibling);
+     }
+     return el;
+    }
 
-				function clearError(input) {
-					var errorEl = getErrorEl(input);
-					errorEl.textContent = "";
-					errorEl.style.display = "none";
-					input.removeAttribute("aria-invalid");
-				}
+    function clearError(input) {
+     var errorEl = getErrorEl(input);
+     errorEl.textContent = "";
+     errorEl.style.display = "none";
+     input.removeAttribute("aria-invalid");
+    }
 
-				function validate(input) {
-					var errorEl = getErrorEl(input);
+    function validate(input) {
+     var errorEl = getErrorEl(input);
 
-					if (input.value !== "" && !PHONE_PATTERN.test(input.value)) {
-						errorEl.textContent = ERROR_TEXT;
-						errorEl.style.display = "block";
-						input.setAttribute("aria-invalid", "true");
-						return false;
-					}
+     if (input.value !== "" && !PHONE_PATTERN.test(input.value)) {
+      errorEl.textContent = ERROR_TEXT;
+      errorEl.style.display = "block";
+      input.setAttribute("aria-invalid", "true");
+      return false;
+     }
 
-					clearError(input);
-					return true;
-				}
+     clearError(input);
+     return true;
+    }
 
-				// Force the value to "+1" followed by at most 10 digits, digits only.
-				function mask(input) {
-					var digits = extractDigits(input.value);
-					input.value = digits ? PREFIX + digits : "";
-				}
+    // Force the value to "+1" followed by at most 10 digits, digits only.
+    function mask(input) {
+     var digits = extractDigits(input.value);
+     input.value = digits ? PREFIX + digits : "";
+    }
 
-				function attach(input) {
-					if (input.dataset.phoneMaskAttached === "true") {
-						return;
-					}
-					input.dataset.phoneMaskAttached = "true";
+    function attach(input) {
+     if (input.dataset.phoneMaskAttached === "true") {
+      return;
+     }
+     input.dataset.phoneMaskAttached = "true";
 
-					mask(input);
+     mask(input);
 
-					input.addEventListener("input", function () {
-						mask(input);
-						if (input.getAttribute("aria-invalid") === "true") {
-							validate(input);
-						}
-					});
-					input.addEventListener("blur", function () {
-						validate(input);
-					});
-				}
+     input.addEventListener("input", function () {
+      mask(input);
+      validate(input);
+     });
+     input.addEventListener("change", function () {
+      mask(input);
+      validate(input);
+     });
+     input.addEventListener("blur", function () {
+      validate(input);
+     });
+    }
 
-				function init() {
-					var input = getInput();
-					if (input) {
-						attach(input);
-						return;
-					}
+    function init() {
+     var input = getInput();
+     if (input) {
+      attach(input);
+      return;
+     }
 
-					var observer = new MutationObserver(function () {
-						var found = getInput();
-						if (found) {
-							observer.disconnect();
-							attach(found);
-						}
-					});
-					observer.observe(document.body, { childList: true, subtree: true });
-				}
+     var observer = new MutationObserver(function () {
+      var found = getInput();
+      if (found) {
+       observer.disconnect();
+       attach(found);
+      }
+     });
+     observer.observe(document.body, { childList: true, subtree: true });
+    }
 
-				if (document.readyState === "loading") {
-					document.addEventListener("DOMContentLoaded", init);
-				} else {
-					init();
-				}
-			})();
-		</script>
-	</body>
+    if (document.readyState === "loading") {
+     document.addEventListener("DOMContentLoaded", init);
+    } else {
+     init();
+    }
+   })();
+  </script>
+ </body>
 </html>
+ 
