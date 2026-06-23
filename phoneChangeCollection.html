@@ -211,13 +211,24 @@
 
 		<script>
 			(function () {
-				var PHONE_PATTERN = /^\+[1-9]\d{9,14}$/;
-				var ERROR_TEXT =
-					"Enter a valid phone number including country code (e.g. +15551234567)";
+				var PREFIX = "+1";
+				var MAX_DIGITS = 10;
+				var PHONE_PATTERN = /^\+1\d{10}$/;
+				var ERROR_TEXT = "Enter a valid 10-digit US phone number";
 				var ERROR_ID = "newPhone-blur-error";
 
 				function getInput() {
 					return document.getElementById("newPhone");
+				}
+
+				// Keep only the 10 subscriber digits, dropping a leading US country code
+				// digit if the value arrived as +1XXXXXXXXXX (e.g. the prepopulated hint).
+				function extractDigits(value) {
+					var digits = (value || "").replace(/\D/g, "");
+					if (digits.length > MAX_DIGITS && digits.charAt(0) === "1") {
+						digits = digits.slice(1);
+					}
+					return digits.slice(0, MAX_DIGITS);
 				}
 
 				function getErrorEl(input) {
@@ -233,36 +244,49 @@
 					return el;
 				}
 
+				function clearError(input) {
+					var errorEl = getErrorEl(input);
+					errorEl.textContent = "";
+					errorEl.style.display = "none";
+					input.removeAttribute("aria-invalid");
+				}
+
 				function validate(input) {
-					var value = (input.value || "").trim();
 					var errorEl = getErrorEl(input);
 
-					if (value !== "" && !PHONE_PATTERN.test(value)) {
+					if (input.value !== "" && !PHONE_PATTERN.test(input.value)) {
 						errorEl.textContent = ERROR_TEXT;
 						errorEl.style.display = "block";
 						input.setAttribute("aria-invalid", "true");
 						return false;
 					}
 
-					errorEl.textContent = "";
-					errorEl.style.display = "none";
-					input.removeAttribute("aria-invalid");
+					clearError(input);
 					return true;
 				}
 
+				// Force the value to "+1" followed by at most 10 digits, digits only.
+				function mask(input) {
+					var digits = extractDigits(input.value);
+					input.value = digits ? PREFIX + digits : "";
+				}
+
 				function attach(input) {
-					if (input.dataset.blurValidationAttached === "true") {
+					if (input.dataset.phoneMaskAttached === "true") {
 						return;
 					}
-					input.dataset.blurValidationAttached = "true";
+					input.dataset.phoneMaskAttached = "true";
 
-					input.addEventListener("blur", function () {
-						validate(input);
-					});
+					mask(input);
+
 					input.addEventListener("input", function () {
+						mask(input);
 						if (input.getAttribute("aria-invalid") === "true") {
 							validate(input);
 						}
+					});
+					input.addEventListener("blur", function () {
+						validate(input);
 					});
 				}
 
