@@ -194,9 +194,6 @@
    (function () {
     var PREFIX = "+1";
     var MAX_DIGITS = 10;
-    var PHONE_PATTERN = /^\+1\d{10}$/;
-    var ERROR_TEXT = "Enter a valid 10-digit US phone number";
-    var ERROR_ID = "newPhone-blur-error";
 
     function getInput() {
      return document.getElementById("newPhone");
@@ -215,41 +212,9 @@
      return digits.slice(0, MAX_DIGITS);
     }
 
-    function getErrorEl(input) {
-     var el = document.getElementById(ERROR_ID);
-     if (!el) {
-      el = document.createElement("div");
-      el.id = ERROR_ID;
-      el.className = "error itemLevel";
-      el.setAttribute("role", "alert");
-      el.style.display = "none";
-      input.parentNode.insertBefore(el, input.nextSibling);
-     }
-     return el;
-    }
-
-    function clearError(input) {
-     var errorEl = getErrorEl(input);
-     errorEl.textContent = "";
-     errorEl.style.display = "none";
-     input.removeAttribute("aria-invalid");
-    }
-
-    function validate(input) {
-     var errorEl = getErrorEl(input);
-
-     if (input.value !== "" && !PHONE_PATTERN.test(input.value)) {
-      errorEl.textContent = ERROR_TEXT;
-      errorEl.style.display = "block";
-      input.setAttribute("aria-invalid", "true");
-      return false;
-     }
-
-     clearError(input);
-     return true;
-    }
-
     // Force the value to "+1" followed by at most 10 digits, digits only.
+    // Validation/error messaging is owned by the B2C claim Restriction pattern,
+    // so this script only normalizes the input format.
     function mask(input) {
      var digits = extractDigits(input.value);
      input.value = digits ? PREFIX + digits : "";
@@ -265,14 +230,9 @@
 
      input.addEventListener("input", function () {
       mask(input);
-      validate(input);
      });
      input.addEventListener("change", function () {
       mask(input);
-      validate(input);
-     });
-     input.addEventListener("blur", function () {
-      validate(input);
      });
     }
 
