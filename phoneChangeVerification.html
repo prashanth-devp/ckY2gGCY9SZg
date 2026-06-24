@@ -235,6 +235,38 @@
    }
   </style>
   <script>
+   // B2C sets the OTP input's placeholder to the plain DisplayName, while the
+   // shared.js only appends the required "*" to the label. Mirror that asterisk
+   // onto the placeholder so it matches the label (e.g. "Enter Verification Code*").
+   (function () {
+    function syncPlaceholder() {
+     var input = document.getElementById("otpCode");
+     if (input && input.placeholder && input.placeholder.indexOf("*") === -1) {
+      input.placeholder = input.placeholder + "*";
+     }
+     return !!input;
+    }
+
+    function initPlaceholder() {
+     if (syncPlaceholder()) {
+      return;
+     }
+
+     var observer = new MutationObserver(function () {
+      if (syncPlaceholder()) {
+       observer.disconnect();
+      }
+     });
+     observer.observe(document.body, { childList: true, subtree: true });
+    }
+
+    if (document.readyState === "loading") {
+     document.addEventListener("DOMContentLoaded", initPlaceholder);
+    } else {
+     initPlaceholder();
+    }
+   })();
+
    document.addEventListener("DOMContentLoaded", function () {
     var backLink = document.getElementById("back-link");
     var resendBtn = document.getElementById("resend-code-btn");
