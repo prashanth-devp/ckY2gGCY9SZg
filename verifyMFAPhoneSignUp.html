@@ -264,6 +264,27 @@
       animation: spin-ease 1s infinite;
     }
 
+    /* Show the "code sent" description immediately on page open and keep it
+       visible (verify-phone-code.js auto-sends the code, then tries to hide
+       .intro). The phone was already collected on the previous step, so we
+       skip straight to the code-entry view. */
+    #api .intro.none {
+      display: block !important;
+    }
+
+    /* Hide the pre-filled phone field so there's no phone-entry flash. */
+    #api .phone_li {
+      display: none !important;
+    }
+
+    /* Hide the auto-clicked "Send verification code" button visually, but keep
+       it in the layout (off-screen, not display:none) so verify-phone-code.js's
+       waitForElementVisible() still fires and auto-sends the code. */
+    #api #phoneVerificationControl_but_send_code {
+      position: absolute !important;
+      left: -9999px !important;
+    }
+
   </style>
 </head>
 <body>
