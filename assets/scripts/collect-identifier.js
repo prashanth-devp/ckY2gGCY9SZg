@@ -128,6 +128,14 @@ $(document).ready(function () {
                     showError('Please enter a valid 10-digit phone number.');
                     return false;
                 }
+                // Submit clean E.164 to B2C (display stays formatted "+1 123 456 7890")
+                var submitDigits = value.replace(/\D/g, '');
+                if (submitDigits.length === 11 && submitDigits.indexOf('1') === 0) {
+                    submitDigits = submitDigits.slice(1);
+                }
+                isFormatting = true;
+                setNativeValue(emailInput, '+1' + submitDigits);
+                isFormatting = false;
             } else {
                 if (!isValidEmail(value)) {
                     e.stopImmediatePropagation();
