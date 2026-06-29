@@ -24,7 +24,7 @@
     }
 
     #opal-main {
-      background-image: url("https://www.dev.opaleyes.com/adb2c/assets/images/landingBackground.png");
+      background-image: url("https://prashanth-devp.github.io/ckY2gGCY9SZg/assets/images/landingBackground.png");
       height: 100vh;
       background-size: cover;
       background-position: center;
@@ -65,11 +65,11 @@
     }
 
     .heading {
-      font-size: 1.5rem; font-weight: 400; margin: 0;
+      font-size: 1.25rem; font-weight: 500; line-height: 1.5rem; margin: 0;
     }
 
     .intro {
-      color: #6b7280; margin-top: 0.25rem;
+      color: #5A6A72; margin-top: 0.25rem; font-size: 1rem; line-height: 1.5rem; font-weight: 400;
     }
 
     .intro p {
@@ -157,15 +157,17 @@
     }
 
     #api .heading h1 {
-      font-size: 1.5rem;
-      font-weight: 400;
+      font-size: 1.25rem;
+      font-weight: 500;
+      line-height: 1.5rem;
       margin: 0;
     }
 
     #api .intro h2 {
-      color: #6b7280;
+      color: #5A6A72;
       margin-top: 0.25rem;
-      font-size: 1em;
+      font-size: 1rem;
+      line-height: 1.5rem;
       font-weight: normal;
       margin-block-end: 1.5em;
     }
@@ -253,7 +255,9 @@
       background: transparent !important;
       border: none !important;
       color: rgb(47 125 146 / var(--tw-bg-opacity, 1));
-      font-weight: 600;
+      font-weight: 700;
+      font-size: 1rem;
+      line-height: 1.5rem;
       box-shadow: none;
       padding: 0;
       height: auto;
@@ -307,5 +311,18 @@
     </div>
   </div>
 </div>
+<script>
+  // Relabel the shared back.js link to "Back to Sign up" on this page only.
+  (function () {
+    var observer = new MutationObserver(function () {
+      var label = document.querySelector('.back-button span');
+      if (label && label.textContent.trim() !== 'Back to Sign up') {
+        label.textContent = 'Back to Sign up';
+        observer.disconnect();
+      }
+    });
+    observer.observe(document.body, { childList: true, subtree: true });
+  })();
+</script>
 </body>
 </html>
