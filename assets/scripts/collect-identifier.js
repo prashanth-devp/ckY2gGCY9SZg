@@ -99,7 +99,7 @@ $(document).ready(function () {
             }
             digits = digits.slice(0, 10);
             // var formatted = digits.length > 0 ? '+1' + digits : '';
-            var formatted = digits.length > 0 ? '+1' + formatPhone(digits) : '';
+            var formatted = digits.length > 0 ? '+1 ' + formatPhone(digits) : '';
             if (this.value === formatted) return;
 
             isFormatting = true;
