@@ -1,8 +1,6 @@
 $(document).ready(function () {
-    var isFormatting = false;
-
     function isPhoneInput(value) {
-        return value.length > 0 && !value.includes('@') && /\d/.test(value);
+        return value.length > 0 && !value.includes('@') && /\d/.test(value) && !/[a-zA-Z]/.test(value);
     }
 
     function isValidPhone(value) {
@@ -11,6 +9,17 @@ $(document).ready(function () {
             digits = digits.slice(1);
         }
         return digits.length === 10;
+    }
+
+    // Pull the 10 national digits out of any phone-ish string, dropping a
+    // leading "+1"/country-code "1" so we can rebuild clean E.164.
+    function extractPhoneDigits(value) {
+        var digits = value.replace(/\D/g, '');
+        var despaced = value.replace(/\s/g, '');
+        if (digits.length > 0 && digits.indexOf('1') === 0 && (despaced.indexOf('+1') === 0 || digits.length === 11)) {
+            digits = digits.slice(1);
+        }
+        return digits.slice(0, 10);
     }
 
     function isValidEmail(value) {
@@ -88,26 +97,65 @@ $(document).ready(function () {
         });
         patternObserver.observe(emailInput, { attributes: true, attributeFilter: ['pattern'] });
 
-        $(emailInput).on('input', function () {
-            if (isFormatting) return;
-            var value = this.value;
-            if (!isPhoneInput(value)) return;
+        // Option A: the real B2C field (#email) must always hold a clean value
+        // (email as typed, or "+1XXXXXXXXXX" for phone) because B2C reads it
+        // directly when "Send verification code" fires. We never put display
+        // spaces into it; instead a separate visible input shows the pretty
+        // "+1 123 456 7890" mask.
+        if (document.getElementById('email-display')) return;
 
-            var digits = value.replace(/\D/g, '');
-            if (digits.length > 0 && digits.indexOf('1') === 0 && value.replace(/\s/g, '').indexOf('+1') === 0) {
-                digits = digits.slice(1);
+        var displayInput = document.createElement('input');
+        displayInput.id = 'email-display';
+        displayInput.type = 'text';
+        displayInput.className = emailInput.className;
+        displayInput.placeholder = emailInput.placeholder || 'Email or phone number';
+        displayInput.setAttribute('autocomplete', 'off');
+        var emailAriaLabel = emailInput.getAttribute('aria-label');
+        if (emailAriaLabel) displayInput.setAttribute('aria-label', emailAriaLabel);
+
+        // Hide the real input but keep it in the DOM for B2C binding/submission.
+        emailInput.style.display = 'none';
+        emailInput.setAttribute('aria-hidden', 'true');
+        emailInput.tabIndex = -1;
+        emailInput.parentNode.insertBefore(displayInput, emailInput);
+
+        function pretty(value) {
+            var digits = extractPhoneDigits(value);
+            return digits.length > 0 ? '+1 ' + formatPhone(digits) : '';
+        }
+
+        function clean(value) {
+            var digits = extractPhoneDigits(value);
+            return digits.length > 0 ? '+1' + digits : '';
+        }
+
+        displayInput.addEventListener('input', function () {
+            var raw = displayInput.value;
+            if (isPhoneInput(raw)) {
+                var formatted = pretty(raw);
+                if (displayInput.value !== formatted) {
+                    displayInput.value = formatted; // caret moves to end (matches prior behavior)
+                }
+                setNativeValue(emailInput, clean(raw));
+            } else {
+                // Email (or empty): mirror straight through to the real field.
+                setNativeValue(emailInput, raw);
             }
-            digits = digits.slice(0, 10);
-            // var formatted = digits.length > 0 ? '+1' + digits : '';
-            var formatted = digits.length > 0 ? '+1 ' + formatPhone(digits) : '';
-            if (this.value === formatted) return;
-
-            isFormatting = true;
-            var nativeSetter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value').set;
-            nativeSetter.call(this, formatted);
-            this.dispatchEvent(new Event('input', { bubbles: true }));
-            isFormatting = false;
         });
+
+        // Keep the display in sync if B2C disables/locks the field after sending.
+        var stateObserver = new MutationObserver(function () {
+            displayInput.disabled = emailInput.disabled;
+            displayInput.readOnly = emailInput.readOnly;
+        });
+        stateObserver.observe(emailInput, { attributes: true, attributeFilter: ['disabled', 'readonly'] });
+
+        // Seed the mask from any value B2C pre-filled (e.g. back navigation).
+        if (emailInput.value) {
+            displayInput.value = isPhoneInput(emailInput.value) ? pretty(emailInput.value) : emailInput.value;
+        }
+
+        displayInput.focus();
     });
 
     suppressB2CPatternError();
@@ -128,14 +176,8 @@ $(document).ready(function () {
                     showError('Please enter a valid 10-digit phone number.');
                     return false;
                 }
-                // Submit clean E.164 to B2C (display stays formatted "+1 123 456 7890")
-                var submitDigits = value.replace(/\D/g, '');
-                if (submitDigits.length === 11 && submitDigits.indexOf('1') === 0) {
-                    submitDigits = submitDigits.slice(1);
-                }
-                isFormatting = true;
-                setNativeValue(emailInput, '+1' + submitDigits);
-                isFormatting = false;
+                // #email already holds clean "+1XXXXXXXXXX" (kept in sync by the
+                // masked display input), so nothing to normalize here.
             } else {
                 if (!isValidEmail(value)) {
                     e.stopImmediatePropagation();
