@@ -247,5 +247,75 @@
     </div>
   </div>
 </div>
+
+<!--
+  Identifier-first sign-in hand-off.
+  When the user enters a phone number on the login screen, signin_v2.js stores it
+  in sessionStorage ('b2c_collected_phone') before routing here. This page is the
+  "enter your phone number" step of the phone sign-in journey, so we pre-fill that
+  number and advance automatically — the user is never asked for it twice.
+  Self-contained (no dependency on the external assets/scripts) so it deploys with
+  this HTML. Polls until ADB2C marks the Continue button enabled before clicking.
+-->
+<script>
+  (function () {
+    var KEY = 'b2c_collected_phone';
+    var carried;
+    try { carried = sessionStorage.getItem(KEY); } catch (e) { return; }
+    if (!carried) return;
+    try { sessionStorage.removeItem(KEY); } catch (e) {}
+
+    var digits = carried.replace(/\D/g, '');
+    if (digits.length === 11 && digits.charAt(0) === '1') {
+      digits = digits.slice(1);
+    }
+    if (digits.length !== 10) return;
+    var e164 = '+1' + digits;
+
+    function formatted(d) {
+      return '(' + d.slice(0, 3) + ') ' + d.slice(3, 6) + '-' + d.slice(6, 10);
+    }
+
+    function setNativeValue(input, value) {
+      var setter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value').set;
+      setter.call(input, value);
+      input.dispatchEvent(new Event('input', { bubbles: true }));
+      input.dispatchEvent(new Event('change', { bubbles: true }));
+    }
+
+    var tries = 0;
+    var MAX_TRIES = 100; // ~10s at 100ms
+    var timer = setInterval(function () {
+      tries++;
+
+      // ADB2C renders the phone claim as #phone (sign-in) or #phoneNumber.
+      var phone = document.getElementById('phone') || document.getElementById('phoneNumber');
+      var continueBtn = document.getElementById('continue');
+
+      if (phone && phone.value !== e164) {
+        setNativeValue(phone, e164);
+        // Keep phone-number.js's visible masked field in sync if present.
+        var display = document.getElementById('formatted-phone');
+        if (display && !display.value) {
+          display.value = formatted(digits);
+        }
+      }
+
+      var enabled = continueBtn && continueBtn.getAttribute('aria-disabled') !== 'true';
+      if (continueBtn && enabled && phone && phone.value === e164) {
+        clearInterval(timer);
+        continueBtn.click();
+        return;
+      }
+
+      if (tries >= MAX_TRIES) {
+        clearInterval(timer);
+        if (continueBtn) {
+          continueBtn.click(); // last-resort; number is pre-filled regardless
+        }
+      }
+    }, 100);
+  })();
+</script>
 </body>
 </html>
