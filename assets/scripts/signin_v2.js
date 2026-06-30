@@ -5,6 +5,37 @@ const config = {
   separatorText: "Don't have an account?",
 };
 
+// --- Identifier-first helpers --------------------------------------------
+// The combined sign-in page renders the email+password form AND the
+// PhoneSignInExchange (phone OTP) button together. We hide the password up
+// front and show a single "email or phone" field (like the sign-up
+// collectIdentifier screen). On Continue we branch: phone numbers are routed
+// to the existing phone-OTP sub-journey via PhoneSignInExchange, while emails
+// reveal the password field and keep the normal combined (password) sign-in.
+function isPhoneInput(value) {
+  return value.length > 0 && !value.includes('@') && /\d/.test(value) && !/[a-zA-Z]/.test(value);
+}
+
+function isValidPhone(value) {
+  var digits = value.replace(/\D/g, '');
+  if (digits.indexOf('1') === 0) {
+    digits = digits.slice(1);
+  }
+  return digits.length === 10;
+}
+
+function isValidEmail(value) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+}
+
+function showIdentifierError(message) {
+  $('#error').text(message).show();
+}
+
+function clearIdentifierError() {
+  $('#error').text('').hide();
+}
+
 function addRequiredSign() {
   if (!window.SA_FIELDS || !window.SA_FIELDS.AttributeFields) return;
   window.SA_FIELDS.AttributeFields.forEach((block) => {
@@ -182,6 +213,103 @@ async function setupNextButtonHandler() {
   });
 }
 
+// Turn the combined sign-in page into an identifier-first flow.
+//   Step 1: only the identifier field ("Email or phone number") + Continue.
+//   Step 2: phone -> route to the phone-OTP sub-journey (PhoneSignInExchange);
+//           email -> reveal password + the real Login button on this page.
+function setupIdentifierFirst(elements) {
+  const signInName = document.getElementById('signInName');
+  const password = document.getElementById('password');
+  const next = elements.next; // real ADB2C submit button
+  const phoneExchange = elements.passwordlessExchange; // #PhoneSignInExchange
+
+  if (!signInName || !password || !next) return;
+
+  // Prefer the dedicated .entry-item wrapper; never fall back to a parent that
+  // could be the whole form (that would hide the identifier field too).
+  const passwordItem = password.closest('.entry-item');
+  const passwordLabel = document.querySelector('.password-label') || document.querySelector('[for="password"]');
+
+  function setPasswordHidden(hidden) {
+    const action = hidden ? 'add' : 'remove';
+    if (passwordItem) {
+      passwordItem.classList[action]('none');
+    } else {
+      password.classList[action]('none');
+      if (passwordLabel) passwordLabel.classList[action]('none');
+    }
+  }
+
+  // Relabel the identifier field so it accepts email OR phone.
+  const signInLabel = document.querySelector('[for="signInName"]');
+  if (signInLabel) signInLabel.textContent = 'Email or phone number';
+  signInName.setAttribute('placeholder', 'Email or phone number');
+
+  function revealPasswordStep() {
+    setPasswordHidden(false);
+    next.classList.remove('none');
+    if (continueBtn) continueBtn.classList.add('none');
+    if (phoneExchange) phoneExchange.classList.add('none');
+    password.focus();
+  }
+
+  // If ADB2C re-rendered the page after a failed sign-in it preserves the
+  // entered username (or a login_hint pre-fills it). Skip straight to the
+  // password step in that case so the user isn't bounced back to step 1.
+  const hasPrefilledIdentifier = signInName.value && signInName.value.trim().length > 0;
+  const hasPageError = $('.pageLevel .error').filter(':visible').length > 0;
+  const startOnPasswordStep = hasPrefilledIdentifier || hasPageError;
+
+  // Build the Continue button (inherits the #api button styling).
+  const continueBtn = document.createElement('button');
+  continueBtn.type = 'button';
+  continueBtn.id = 'identifierContinue';
+  continueBtn.textContent = 'Continue';
+  next.parentNode.insertBefore(continueBtn, next);
+
+  if (startOnPasswordStep) {
+    revealPasswordStep();
+  } else {
+    // Step 1 state: hide password + real Login button, hide the redundant
+    // "Login with one time password" option (phone is auto-routed on Continue).
+    setPasswordHidden(true);
+    next.classList.add('none');
+    if (phoneExchange) phoneExchange.classList.add('none');
+  }
+
+  continueBtn.addEventListener('click', function () {
+    clearIdentifierError();
+    const value = signInName.value.trim();
+
+    if (!value) {
+      showIdentifierError('Please enter an email address or phone number.');
+      return;
+    }
+
+    if (isPhoneInput(value)) {
+      if (!isValidPhone(value)) {
+        showIdentifierError('Please enter a valid 10-digit phone number.');
+        return;
+      }
+      if (!phoneExchange) {
+        showIdentifierError('Phone sign-in is unavailable. Please sign in with your email.');
+        return;
+      }
+      // Hand off to the phone-OTP sub-journey (collects phone + sends code).
+      phoneExchange.classList.remove('none');
+      phoneExchange.click();
+      return;
+    }
+
+    if (!isValidEmail(value)) {
+      showIdentifierError('Please enter a valid email address.');
+      return;
+    }
+
+    revealPasswordStep();
+  });
+}
+
 async function reorganizeLoginPage() {
   try {
     const elements = await waitForElements();
@@ -197,6 +325,7 @@ async function reorganizeLoginPage() {
     );
     removeSocialIntro(elements.socialSection);
     setupNextButtonHandler();
+    setupIdentifierFirst(elements);
   } catch (error) {
     console.warn(error.message);
     if (document.querySelector('#api[data-name="SelfAsserted"]')) {
