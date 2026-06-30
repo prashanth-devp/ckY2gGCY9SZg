@@ -116,4 +116,36 @@ $(document).ready(async function () {
     if (originalPhoneInput.value) {
         formattedPhoneInput.value = formatPhoneNumber(originalPhoneInput.value.replace(/^\+1/, ''));
     }
+
+    // Identifier-first sign-in hand-off: the number was already entered on the
+    // login screen and stashed in sessionStorage (see signin_v2.js). Pre-fill it
+    // here and auto-advance so the user isn't asked for the number again.
+    try {
+        var carried = sessionStorage.getItem('b2c_collected_phone');
+        if (carried) {
+            sessionStorage.removeItem('b2c_collected_phone');
+            var carriedDigits = carried.replace(/\D/g, '');
+            if (carriedDigits.length === 11 && carriedDigits.indexOf('1') === 0) {
+                carriedDigits = carriedDigits.slice(1);
+            }
+            if (carriedDigits.length === 10 && !originalPhoneInput.value) {
+                var nativeSetter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value').set;
+                nativeSetter.call(originalPhoneInput, '+1' + carriedDigits);
+                originalPhoneInput.dispatchEvent(new Event('input', { bubbles: true }));
+                originalPhoneInput.dispatchEvent(new Event('change', { bubbles: true }));
+                formattedPhoneInput.value = formatPhoneNumber(carriedDigits);
+
+                // Best-effort auto-advance; if it no-ops the number is still
+                // pre-filled, so the user only needs to press Continue.
+                waitForInputEnabled('continue').then(function () {
+                    setTimeout(function () {
+                        var continueBtn = document.getElementById('continue');
+                        if (continueBtn) {
+                            continueBtn.click();
+                        }
+                    }, 300);
+                });
+            }
+        }
+    } catch (e) {}
 });
