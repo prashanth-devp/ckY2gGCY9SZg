@@ -168,15 +168,8 @@
         margin-top: 0.5rem;
       }
 
+      /* Heading + intro are injected by ADB2C from the policy (ux.signin.en). Styling per Figma. */
       #api .heading h1 {
-        font-size: 1.5rem;
-        font-weight: 400;
-        margin: 0;
-      }
-
-      /* Static "Welcome back!" heading moved out of the policy (ux.signin.en).
-         Styling per Figma: text-xl / font-medium / leading-6 / Content-Primary-Default. */
-      .heading h1 {
         color: #1a1a1a;
         font-size: 1.25rem;
         font-weight: 500;
@@ -184,28 +177,13 @@
         margin: 0;
       }
 
-      /* Suppress any empty heading ADB2C may still inject into #api. */
-      #api .heading {
-        display: none;
-      }
-
-      /* Static intro moved from the policy. Styling per Figma:
-         text-lg / font-normal / leading-6 / tracking-tight / Content-Secondary-Default. */
-      .intro h2 {
+      #api .intro h2 {
         color: #5a6a72;
         margin-top: 0.25rem;
         font-size: 1.125rem;
         font-weight: 400;
         line-height: 1.5rem;
         letter-spacing: -0.025em;
-        margin-block-end: 1.5em;
-      }
-
-      #api .intro h2 {
-        color: #6b7280;
-        margin-top: 0.25rem;
-        font-size: 1em;
-        font-weight: normal;
         margin-block-end: 1.5em;
       }
 
@@ -337,10 +315,6 @@
 
         <!-- Login Box -->
         <div class="container unified_container signIn" role="presentation">
-          <!-- heading moved here from the ADB2C policy (ux.signin.en) -->
-          <div class="heading"><h1>Welcome back!</h1></div>
-          <!-- intro moved from the policy; persistent subtitle shown on both steps -->
-          <div class="intro" id="localIntro"><h2>Enter your email or phone number and password to login</h2></div>
           <div id="api" class="signIn"></div>
           <!-- REPLACE END -->
           <div id="error" class="error"></div>
