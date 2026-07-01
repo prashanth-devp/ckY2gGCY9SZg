@@ -174,6 +174,21 @@
         margin: 0;
       }
 
+       /* Static "Welcome back!" heading moved out of the policy (ux.signin.en).
+         Styling per Figma: text-xl / font-medium / leading-6 / Content-Primary-Default. */
+      .heading h1 {
+        color: #1a1a1a;
+        font-size: 1.25rem;
+        font-weight: 500;
+        line-height: 1.5rem;
+        margin: 0;
+      }
+
+      /* Suppress any empty heading ADB2C may still inject into #api. */
+      #api .heading {
+        display: none;
+      }
+
       #api .intro h2 {
         color: #6b7280;
         margin-top: 0.25rem;
@@ -310,6 +325,8 @@
 
         <!-- Login Box -->
         <div class="container unified_container signIn" role="presentation">
+          <!-- heading moved here from the ADB2C policy (ux.signin.en) -->
+          <div class="heading"><h1>Welcome back!</h1></div>
           <div id="api" class="signIn"></div>
           <!-- REPLACE END -->
           <div id="error" class="error"></div>
