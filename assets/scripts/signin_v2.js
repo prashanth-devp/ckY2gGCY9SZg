@@ -266,8 +266,8 @@ function setupIdentifierFirst(elements) {
 
   // Relabel the identifier field so it accepts email OR phone.
   const signInLabel = document.querySelector('[for="signInName"]');
-  if (signInLabel) signInLabel.textContent = 'Email or phone number';
-  signInName.setAttribute('placeholder', 'Email or phone number');
+  if (signInLabel) signInLabel.textContent = 'Your email or phone number';
+  signInName.setAttribute('placeholder', 'Your email or phone number');
 
   function revealPasswordStep() {
     setPasswordHidden(false);
