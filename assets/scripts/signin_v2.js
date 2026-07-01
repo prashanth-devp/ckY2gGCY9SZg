@@ -28,6 +28,21 @@ function isValidEmail(value) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
 }
 
+// Normalize whatever the user typed into clean E.164 (+1XXXXXXXXXX), dropping
+// a leading country-code "1" so the phone-collect page can pre-fill it.
+function toE164(value) {
+  var digits = value.replace(/\D/g, '');
+  if (digits.length === 11 && digits.indexOf('1') === 0) {
+    digits = digits.slice(1);
+  }
+  digits = digits.slice(0, 10);
+  return digits.length === 10 ? '+1' + digits : '';
+}
+
+// Key the phone-collect page (phone-number.js) reads to pre-fill + auto-advance,
+// mirroring how verify-signin.js consumes b2c_collected_email.
+const COLLECTED_PHONE_KEY = 'b2c_collected_phone';
+
 function showIdentifierError(message) {
   $('#error').text(message).show();
 }
@@ -225,6 +240,15 @@ function setupIdentifierFirst(elements) {
 
   if (!signInName || !password || !next) return;
 
+  // "Forgot password?" only makes sense once we ask for a password, so it stays
+  // hidden on the identifier step and is revealed with the password field.
+  const forgotPassword = elements.forgotPassword;
+  const forgotContainer = forgotPassword ? forgotPassword.parentNode : null;
+  function setForgotHidden(hidden) {
+    const target = forgotContainer || forgotPassword;
+    if (target) target.classList[hidden ? 'add' : 'remove']('none');
+  }
+
   // Prefer the dedicated .entry-item wrapper; never fall back to a parent that
   // could be the whole form (that would hide the identifier field too).
   const passwordItem = password.closest('.entry-item');
@@ -247,6 +271,7 @@ function setupIdentifierFirst(elements) {
 
   function revealPasswordStep() {
     setPasswordHidden(false);
+    setForgotHidden(false);
     next.classList.remove('none');
     if (continueBtn) continueBtn.classList.add('none');
     if (phoneExchange) phoneExchange.classList.add('none');
@@ -270,9 +295,11 @@ function setupIdentifierFirst(elements) {
   if (startOnPasswordStep) {
     revealPasswordStep();
   } else {
-    // Step 1 state: hide password + real Login button, hide the redundant
-    // "Login with one time password" option (phone is auto-routed on Continue).
+    // Step 1 state: hide password + real Login button, hide "Forgot password?"
+    // (only relevant with a password), hide the redundant "Login with one time
+    // password" option (phone is auto-routed on Continue).
     setPasswordHidden(true);
+    setForgotHidden(true);
     next.classList.add('none');
     if (phoneExchange) phoneExchange.classList.add('none');
   }
@@ -295,6 +322,10 @@ function setupIdentifierFirst(elements) {
         showIdentifierError('Phone sign-in is unavailable. Please sign in with your email.');
         return;
       }
+      // Carry the number to the phone-collect page so it isn't asked again.
+      try {
+        sessionStorage.setItem(COLLECTED_PHONE_KEY, toE164(value));
+      } catch (e) {}
       // Hand off to the phone-OTP sub-journey (collects phone + sends code).
       phoneExchange.classList.remove('none');
       phoneExchange.click();
