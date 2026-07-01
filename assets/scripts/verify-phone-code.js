@@ -119,7 +119,9 @@ $(document).ready(function () {
     }
 
     $('.phone_li').addClass('none');
-    $('.intro').addClass('none');
+    // Scope to the ADB2C-injected intro only; the page's static .intro
+    // (heading/intro moved out of the policy) must stay visible.
+    $('#api .intro').addClass('none');
     startResendTimer();
   });
 
