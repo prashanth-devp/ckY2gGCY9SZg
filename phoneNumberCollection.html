@@ -238,18 +238,21 @@
         }
       }
 
-      var enabled = continueBtn && continueBtn.getAttribute('aria-disabled') !== 'true';
+      // Treat the button as enabled only when ADB2C has truly enabled it — check
+      // BOTH the aria flag and the disabled property — so we don't click a still
+      // disabled button. Keep polling after the click (the page unloads on a
+      // successful submit; if it didn't take, the next tick retries) instead of
+      // giving up after a single click.
+      var enabled = continueBtn &&
+        continueBtn.getAttribute('aria-disabled') !== 'true' &&
+        !continueBtn.disabled;
+
       if (continueBtn && enabled && phone && phone.value === e164) {
-        clearInterval(timer);
         continueBtn.click();
-        return;
       }
 
       if (tries >= MAX_TRIES) {
         clearInterval(timer);
-        if (continueBtn) {
-          continueBtn.click(); // last-resort; number is pre-filled regardless
-        }
       }
     }, 100);
   })();
