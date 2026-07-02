@@ -109,7 +109,7 @@ $(document).ready(function () {
     });
   }
 
-  $('#phoneVerificationControl_but_send_code').on('click', async function () {
+  $(document).on('click', '#phoneVerificationControl_but_send_code', async function () {
     await waitForElementVisible('.verificationCode_li');
 
     $('#api').show();
@@ -123,7 +123,7 @@ $(document).ready(function () {
     startResendTimer();
   });
 
-  $('#phoneVerificationControl_but_send_new_code').on('click', function () {
+  $(document).on('click', '#phoneVerificationControl_but_send_new_code', function () {
     startResendTimer();
   });
 
@@ -195,7 +195,7 @@ $(document).ready(function () {
     });
   }
 
-  $('#phoneVerificationControl_but_verify_code').on('click', async function () {
+  $(document).on('click', '#phoneVerificationControl_but_verify_code', async function () {
     var codeValue = $('#verificationCode').val();
     if (!codeValue || !codeValue.trim()) {
       return;
@@ -274,7 +274,6 @@ $(document).ready(function () {
   waitForElementVisible('#phoneVerificationControl_but_send_code').then(async () => {
     const hasPhone = await waitForPhoneValue();
     if (hasPhone) {
-      await waitForButtonEnabled('phoneVerificationControl_but_send_code');
       $('#phoneVerificationControl_but_send_code').click();
     }
   });
