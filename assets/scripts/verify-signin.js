@@ -117,11 +117,9 @@ $(document).ready(function () {
 
   function handlePhoneVerificationSkip() {
     var $phone = $('#phone');
-    var phoneValue = $phone.val();
+    var phoneValue = $phone.val().trim();
 
     if (isEmailValue(phoneValue)) {
-      $phone.val('');
-      $phone.trigger('input').trigger('change');
       var phoneInput = $phone[0];
       if (phoneInput) {
         var nativeSetter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value').set;
@@ -129,6 +127,38 @@ $(document).ready(function () {
         phoneInput.dispatchEvent(new Event('input', { bubbles: true }));
         phoneInput.dispatchEvent(new Event('change', { bubbles: true }));
       }
+      phoneValue = '';
+    }
+
+    if (!phoneValue) {
+      var stored;
+      try { stored = sessionStorage.getItem('b2c_collected_phone'); } catch (e) {}
+      if (stored) {
+        try { sessionStorage.removeItem('b2c_collected_phone'); } catch (e) {}
+        var phoneInput = $phone[0];
+        if (phoneInput) {
+          var nativeSetter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value').set;
+          nativeSetter.call(phoneInput, stored);
+          phoneInput.dispatchEvent(new Event('input', { bubbles: true }));
+          phoneInput.dispatchEvent(new Event('change', { bubbles: true }));
+          phoneValue = stored;
+        }
+      }
+    }
+
+    if (phoneValue && !isEmailValue(phoneValue)) {
+      $('.phone_li').addClass('none');
+      $('.intro').addClass('none');
+      setTimeout(function () {
+        $('#phoneVerificationControl_but_send_code').click();
+      }, 300);
+      waitForButtonEnabled('continue').then(function (button) {
+        setTimeout(function () { button.click(); }, 0);
+        waitForElementVisible('#claimVerificationServerError').then(function () {
+          $('#api').show();
+        });
+      });
+      return;
     }
 
     $('.container').append('<div id="loading-indicator" style="text-align:center;padding:2rem;"><div class="spinner"></div></div>');
