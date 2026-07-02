@@ -1,3 +1,26 @@
+// Refresh guard. The phone number is handed into this OTP screen only once, via
+// sessionStorage ('b2c_collected_phone'), and it is consumed (deleted) below on
+// first load. A browser refresh therefore re-renders this step with no phone
+// context, which would strand the user on a half-initialized auto-advance screen
+// (empty phone field + any stray verification error). On a reload we instead send
+// the user back to the sign-in screen to start over cleanly. Runs before the
+// prefill logic below so nothing flashes first.
+(function () {
+  try {
+    var carried = sessionStorage.getItem('b2c_collected_phone');
+    var navEntry = (performance.getEntriesByType &&
+      performance.getEntriesByType('navigation')[0]) || null;
+    var isReload = navEntry
+      ? navEntry.type === 'reload'
+      : (performance.navigation && performance.navigation.type === 1);
+    if (isReload && !carried && window.history.length > 1) {
+      // Hide the page so the broken OTP state never flashes before we leave.
+      document.documentElement.style.visibility = 'hidden';
+      window.history.back();
+    }
+  } catch (e) {}
+})();
+
 (function () {
   var KEY = 'b2c_collected_phone';
   var carried;
