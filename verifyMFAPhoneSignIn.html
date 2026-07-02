@@ -241,14 +241,28 @@
 
     #api .buttons {
       display: flex;
-      flex-direction: row-reverse;
+      flex-direction: column;
+      align-items: stretch;
       gap: 10px;
     }
 
+    /* Primary "Login to Opal" stays full-width teal (#api button).
+       "Resend code" renders as a centered teal text link, not an outlined button. */
     #api .sendNewCode {
-      background: white;
-      color: #5A6A72;
-      border: 1px solid #5A6A72;
+      align-self: center;
+      width: auto;
+      height: auto;
+      padding: 0.25rem 0;
+      background: transparent;
+      color: rgb(47 125 146 / var(--tw-bg-opacity, 1));
+      border: none;
+      font-weight: 500;
+      font-size: 0.875rem;
+      text-decoration: none;
+    }
+
+    #api .sendNewCode:hover {
+      text-decoration: underline;
     }
 
   </style>
