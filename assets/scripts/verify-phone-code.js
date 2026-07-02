@@ -274,6 +274,7 @@ $(document).ready(function () {
   waitForElementVisible('#phoneVerificationControl_but_send_code').then(async () => {
     const hasPhone = await waitForPhoneValue();
     if (hasPhone) {
+      await waitForButtonEnabled('phoneVerificationControl_but_send_code');
       $('#phoneVerificationControl_but_send_code').click();
     }
   });
