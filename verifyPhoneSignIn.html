@@ -205,10 +205,68 @@
 
       <div id="api"></div>
 
-      <!-- Errors area used by verify-phone-signin.js -->
+      <!-- Errors area used by verify-phone-code.js -->
       <div id="error" class="error"></div>
     </div>
   </div>
 </div>
+
+<!--
+  Identifier-first sign-in hand-off (phone OTP).
+  signin_v2.js stored the number the user typed on the login screen in
+  sessionStorage ('b2c_collected_phone') before routing here; we pre-fill the phone field
+  so verify-phone-code.js auto-sends the code and the user goes straight to entering it.
+  If nothing was carried, the phone field stays editable (graceful fallback).
+-->
+<script>
+  (function () {
+    var KEY = 'b2c_collected_phone';
+    var carried;
+    try { carried = sessionStorage.getItem(KEY); } catch (e) { return; }
+    if (!carried) return;
+    try { sessionStorage.removeItem(KEY); } catch (e) {}
+
+    var digits = carried.replace(/\D/g, '');
+    if (digits.length === 11 && digits.charAt(0) === '1') {
+      digits = digits.slice(1);
+    }
+    if (digits.length !== 10) return;
+    var e164 = '+1' + digits;
+
+    function formatted(d) {
+      return '(' + d.slice(0, 3) + ') ' + d.slice(3, 6) + '-' + d.slice(6, 10);
+    }
+
+    function setNativeValue(input, value) {
+      var setter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value').set;
+      setter.call(input, value);
+      input.dispatchEvent(new Event('input', { bubbles: true }));
+      input.dispatchEvent(new Event('change', { bubbles: true }));
+    }
+
+    var tries = 0;
+    var MAX_TRIES = 100;
+    var timer = setInterval(function () {
+      tries++;
+
+      var phone = document.getElementById('phone');
+      if (phone && phone.value !== e164) {
+        setNativeValue(phone, e164);
+        var display = document.getElementById('formatted-phone');
+        if (display && !display.value) {
+          display.value = formatted(digits);
+        }
+      }
+
+      if (phone && phone.value === e164) {
+        clearInterval(timer);
+      }
+
+      if (tries >= MAX_TRIES) {
+        clearInterval(timer);
+      }
+    }, 100);
+  })();
+</script>
 </body>
 </html>
