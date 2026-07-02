@@ -28,7 +28,12 @@
   var timer = setInterval(function () {
     tries++;
 
-    if (document.querySelector('.verificationCode_li:not(.none)')) {
+    // Stop once the code-entry step is actually on screen. B2C hides this row
+    // with an inline `display:none` (not the `.none` class), so we must test real
+    // visibility (offsetParent is null when the element or an ancestor is hidden);
+    // a `:not(.none)` check false-matches the hidden row and bails before filling.
+    var codeLi = document.querySelector('.verificationCode_li');
+    if (codeLi && codeLi.offsetParent !== null) {
       clearInterval(timer);
       return;
     }
