@@ -246,23 +246,21 @@
       gap: 10px;
     }
 
-    /* Primary "Login to Opal" stays full-width teal (#api button).
-       "Resend code" renders as a centered teal text link, not an outlined button. */
+    /* Tertiary/Small button (Figma "Resend code"): full-width white bg, teal bold text, 40px tall.
+       Overrides the primary #api button styles above. */
     #api .sendNewCode {
-      align-self: center;
-      width: auto;
-      height: auto;
-      padding: 0.25rem 0;
-      background: transparent;
-      color: rgb(47 125 146 / var(--tw-bg-opacity, 1));
+      width: 100%;                 /* self-stretch */
+      min-width: 9rem;             /* min-w-36 */
+      height: 2.5rem;              /* h-10 */
+      min-height: 2.5rem;          /* min-h-10 */
+      max-height: 2.5rem;          /* max-h-10 */
+      padding: 0.5rem 0;           /* py-2 */
+      background: white;           /* bg-white */
+      color: rgb(47 125 146 / var(--tw-bg-opacity, 1)); /* text-Content-Tertiary-Default */
+      font-size: 1rem;             /* text-base */
+      font-weight: 700;            /* font-bold */
+      line-height: 1.5rem;         /* leading-6 */
       border: none;
-      font-weight: 500;
-      font-size: 0.875rem;
-      text-decoration: none;
-    }
-
-    #api .sendNewCode:hover {
-      text-decoration: underline;
     }
 
   </style>
