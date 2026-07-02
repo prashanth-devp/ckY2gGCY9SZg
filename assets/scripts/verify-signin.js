@@ -117,7 +117,7 @@ $(document).ready(function () {
 
   function handlePhoneVerificationSkip() {
     var $phone = $('#phone');
-    var phoneValue = $phone.val().trim();
+    var phoneValue = ($phone.val() || '').trim();
 
     if (isEmailValue(phoneValue)) {
       var phoneInput = $phone[0];
@@ -181,7 +181,9 @@ $(document).ready(function () {
   }
 
   waitForElement('#phoneVerificationControl_but_send_code').then(function () {
-    if (!document.getElementById('emailVerificationControl')) {
+    var emailControl = document.getElementById('emailVerificationControl');
+    var emailVisible = emailControl && $(emailControl).is(':visible');
+    if (!emailVisible) {
       handlePhoneVerificationSkip();
     }
   });
