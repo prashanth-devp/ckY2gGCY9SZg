@@ -327,7 +327,9 @@ function setupIdentifierFirst(elements) {
         sessionStorage.setItem(COLLECTED_PHONE_KEY, toE164(value));
       } catch (e) {}
       // Hand off to the phone-OTP sub-journey (collects phone + sends code).
-      phoneExchange.classList.remove('none');
+      // Keep the exchange button hidden — a programmatic .click() fires its
+      // handler even while display:none, so revealing it would only flash the
+      // "Sign in with phone" label on screen during the navigation gap.
       phoneExchange.click();
       return;
     }
