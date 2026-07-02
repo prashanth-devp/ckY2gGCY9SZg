@@ -119,9 +119,7 @@ $(document).ready(function () {
     }
 
     $('.phone_li').addClass('none');
-    // Scope to the ADB2C-injected intro only; the page's static .intro
-    // (heading/intro moved out of the policy) must stay visible.
-    $('#api .intro').addClass('none');
+    $('.intro').addClass('none');
     startResendTimer();
   });
 
@@ -236,8 +234,46 @@ $(document).ready(function () {
     }
   });
 
-  waitForElementVisible('#phoneVerificationControl_but_send_code').then(() => {
-    if ($('#phone').val().trim() !== '') {
+  // Resolves true once #phone has a value, false after a short timeout. On pages where the
+  // phone is prefilled server-side (from the claim) this resolves immediately; on phone
+  // sign-in the number is injected client-side (from sessionStorage) a moment after render,
+  // so we wait for it before auto-sending — otherwise the one-shot check below would miss it.
+  function waitForPhoneValue() {
+    return new Promise((resolve) => {
+      if ($('#phone').val().trim() !== '') {
+        resolve(true);
+        return;
+      }
+
+      let settled = false;
+      const done = (value) => {
+        if (settled) return;
+        settled = true;
+        clearInterval(pollInterval);
+        clearTimeout(timeout);
+        observer.disconnect();
+        resolve(value);
+      };
+
+      const check = () => {
+        if ($('#phone').val().trim() !== '') done(true);
+      };
+
+      const pollInterval = setInterval(check, 100);
+      const timeout = setTimeout(() => done(false), 5000);
+      const observer = new MutationObserver(check);
+      observer.observe(document.body, {
+        childList: true,
+        subtree: true,
+        attributes: true,
+        attributeFilter: ['value'],
+      });
+    });
+  }
+
+  waitForElementVisible('#phoneVerificationControl_but_send_code').then(async () => {
+    const hasPhone = await waitForPhoneValue();
+    if (hasPhone) {
       $('#phoneVerificationControl_but_send_code').click();
     }
   });
