@@ -367,22 +367,4 @@ async function reorganizeLoginPage() {
   }
 }
 
-// The phone sign-in OTP screen sends number-related errors (phone validation,
-// "too many requests" SMS throttling) back here via sessionStorage rather than
-// showing them on the OTP screen. Surface and clear that message on arrival,
-// including when this page is restored from the back/forward (bfcache) cache.
-function showCarriedSignInError() {
-  try {
-    var msg = sessionStorage.getItem('b2c_signin_error');
-    if (!msg) return;
-    sessionStorage.removeItem('b2c_signin_error');
-    showIdentifierError(msg);
-  } catch (e) {}
-}
-
-showCarriedSignInError();
-window.addEventListener('pageshow', function (event) {
-  if (event.persisted) showCarriedSignInError();
-});
-
 reorganizeLoginPage();

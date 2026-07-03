@@ -108,16 +108,28 @@
       outline: none;
     }
 
-    #api button {
-      width: 100%;
-      background-color: rgb(47 125 146 / var(--tw-bg-opacity, 1));
-      color: white;
-      font-weight: 700;
-      padding: 0.75rem;
+     #api .buttons {
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 10px;
+    }
+
+    /* Tertiary/Small button (Figma "Resend code"): full-width white bg, teal bold text, 40px tall.
+       Overrides the primary #api button styles above. */
+    #api .sendNewCode {
+      width: 100%;                 /* self-stretch */
+      min-width: 9rem;             /* min-w-36 */
+      height: 2.5rem;              /* h-10 */
+      min-height: 2.5rem;          /* min-h-10 */
+      max-height: 2.5rem;          /* max-h-10 */
+      padding: 0.5rem 0;           /* py-2 */
+      background: white;           /* bg-white */
+      color: rgb(47 125 146 / var(--tw-bg-opacity, 1)); /* text-Content-Tertiary-Default */
+      font-size: 1rem;             /* text-base */
+      font-weight: 700;            /* font-bold */
+      line-height: 1.5rem;         /* leading-6 */
       border: none;
-      cursor: pointer;
-      transition: background-color 0.2s ease-in-out;
-      height: 56px;
     }
 
     .btn:hover {
@@ -241,26 +253,14 @@
 
     #api .buttons {
       display: flex;
-      flex-direction: column;
-      align-items: stretch;
+      flex-direction: row-reverse;
       gap: 10px;
     }
 
-    /* Tertiary/Small button (Figma "Resend code"): full-width white bg, teal bold text, 40px tall.
-       Overrides the primary #api button styles above. */
     #api .sendNewCode {
-      width: 100%;                 /* self-stretch */
-      min-width: 9rem;             /* min-w-36 */
-      height: 2.5rem;              /* h-10 */
-      min-height: 2.5rem;          /* min-h-10 */
-      max-height: 2.5rem;          /* max-h-10 */
-      padding: 0.5rem 0;           /* py-2 */
-      background: white;           /* bg-white */
-      color: rgb(47 125 146 / var(--tw-bg-opacity, 1)); /* text-Content-Tertiary-Default */
-      font-size: 1rem;             /* text-base */
-      font-weight: 700;            /* font-bold */
-      line-height: 1.5rem;         /* leading-6 */
-      border: none;
+      background: white;
+      color: #5A6A72;
+      border: 1px solid #5A6A72;
     }
 
   </style>
@@ -288,5 +288,6 @@
     </div>
   </div>
 </div>
+
 </body>
 </html>
