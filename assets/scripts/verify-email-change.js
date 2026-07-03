@@ -156,10 +156,15 @@ $(document).ready(function () {
     }
   });
 
+  var originalHeading = '';
+
   $('#emailVerificationControl_but_send_code').on('click', async function () {
     await waitForElementVisible('.verificationCode_li');
 
     $('#api').show();
+    if (!originalHeading) {
+      originalHeading = $('#api h1').text();
+    }
     const introMessage = window?.SA_FIELDS.AttributeFields[0]?.DISPLAY_CONTROL_CONTENT?.intro_msg;
     if (introMessage) {
       $('#api h1').text(introMessage);
@@ -168,6 +173,28 @@ $(document).ready(function () {
     $('.email_li').addClass('none');
     $('.intro').addClass('none');
     startResendTimer();
+
+    // Reveal the Back link on the code step; it returns to the email-entry step via the
+    // native "change email" action (the email link/change flow has no separate previous page).
+    var backLink = document.getElementById('code-back-link');
+    if (backLink) {
+      backLink.classList.add('show');
+      if (!backLink.dataset.wired) {
+        backLink.dataset.wired = 'true';
+        backLink.addEventListener('click', function () {
+          backLink.classList.remove('show');
+          $('.email_li').removeClass('none');
+          $('.intro').removeClass('none');
+          if (originalHeading) {
+            $('#api h1').text(originalHeading);
+          }
+          var changeBtn = document.getElementById('emailVerificationControl_but_change_claims');
+          if (changeBtn) {
+            changeBtn.click();
+          }
+        });
+      }
+    }
   });
 
   $('#emailVerificationControl_but_send_new_code').on('click', function () {

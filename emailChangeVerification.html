@@ -202,12 +202,38 @@
       display: none !important;
     }
 
+    /* "A verification code has been sent…" shown as the subtext on the code step. */
     #api #emailVerificationControl_success_message {
-      display: none !important;
+      color: #5A6A72;
+      font-size: 1rem;
+      line-height: 1.5rem;
+      font-weight: 400;
+      margin: 4px 0 16px 0;
     }
 
     #api #emailVerificationControl_but_change_claims {
       display: none !important;
+    }
+
+    /* Back link, shown only on the code step (returns to the email step). */
+    .code-back-link {
+      display: none;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      color: #1a1a1a;
+      font-size: 14px;
+      font-weight: 500;
+      line-height: 20px;
+      margin-bottom: 16px;
+    }
+
+    .code-back-link.show {
+      display: flex;
+    }
+
+    .code-back-link:hover {
+      text-decoration: underline;
     }
 
     #api form#attributeVerification > .buttons {
@@ -280,6 +306,13 @@
     <h1 class="headline">See clearly, shop simply with Opal</h1>
 
     <div class="container unified_container" role="presentation">
+
+      <a class="code-back-link" id="code-back-link" href="javascript:void(0)">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M10.828 12l4.95 4.95-1.414 1.414L8 12l6.364-6.364 1.414 1.414z" />
+        </svg>
+        <span>Back</span>
+      </a>
 
       <div id="api"></div>
 
