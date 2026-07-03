@@ -189,21 +189,56 @@
    .none {
     display: none !important;
    }
+
+   /* Formatted phone entry: fixed "+1" prefix + space-grouped digits.
+      The real B2C claim input (#newPhone) is hidden and holds clean E.164. */
+   .phone-input-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border-bottom: 1px solid #1a1a1a;
+    padding: 8px 12px;
+    height: 40px;
+    box-sizing: border-box;
+   }
+
+   .phone-input-wrapper:focus-within {
+    border-bottom-color: #2f7d92;
+   }
+
+   .phone-prefix {
+    color: #1a1a1a;
+    font-size: 16px;
+    line-height: 24px;
+   }
+
+   #api input.phone-visible {
+    flex: 1;
+    border: none !important;
+    border-bottom: none !important;
+    padding: 0 !important;
+    height: auto !important;
+    background: transparent;
+    font-size: 16px;
+    font-family: "Rethink Sans", sans-serif;
+    color: #1a1a1a;
+    line-height: 24px;
+   }
+
+   .phone-visible:focus {
+    outline: none;
+   }
   </style>
   <script>
+   // Show a fixed "+1" prefix and format the subscriber number with spaces
+   // ("+1  123 456 7890") while keeping the real B2C claim input (#newPhone) as
+   // clean E.164 ("+11234567890"), which is what the SMS/OTP send expects.
    (function () {
-    var PREFIX = "+1";
     var MAX_DIGITS = 10;
 
-    function getInput() {
-     return document.getElementById("newPhone");
-    }
-
-    // Keep only the 10 subscriber digits. The "+1" prefix is fixed and re-added
-    // by mask(), so always drop a single leading country-code "1" here; otherwise
-    // editing (e.g. backspace) would fold the prefix digit back into the
-    // subscriber number, e.g. +19999999999 -> +11999999999. US/NANP subscriber
-    // numbers never start with 1, so this is unambiguous.
+    // Keep only the 10 subscriber digits. Drop a single leading country-code "1"
+    // so editing the prefix never folds it into the subscriber number. US/NANP
+    // subscriber numbers never start with 1, so this is unambiguous.
     function extractDigits(value) {
      var digits = (value || "").replace(/\D/g, "");
      if (digits.charAt(0) === "1") {
@@ -212,42 +247,74 @@
      return digits.slice(0, MAX_DIGITS);
     }
 
-    // Force the value to "+1" followed by at most 10 digits, digits only.
-    // Validation/error messaging is owned by the B2C claim Restriction pattern,
-    // so this script only normalizes the input format.
-    function mask(input) {
-     var digits = extractDigits(input.value);
-     input.value = digits ? PREFIX + digits : "";
+    // Group as "XXX XXX XXXX" for display only.
+    function formatDisplay(digits) {
+     if (digits.length <= 3) {
+      return digits;
+     }
+     if (digits.length <= 6) {
+      return digits.slice(0, 3) + " " + digits.slice(3);
+     }
+     return digits.slice(0, 3) + " " + digits.slice(3, 6) + " " + digits.slice(6, 10);
     }
 
-    function attach(input) {
-     if (input.dataset.phoneMaskAttached === "true") {
+    function build(hidden) {
+     if (hidden.dataset.phoneFormatAttached === "true") {
       return;
      }
-     input.dataset.phoneMaskAttached = "true";
+     hidden.dataset.phoneFormatAttached = "true";
 
-     mask(input);
+     // Hide the real claim input; a visible formatted input drives it.
+     hidden.style.display = "none";
 
-     input.addEventListener("input", function () {
-      mask(input);
-     });
-     input.addEventListener("change", function () {
-      mask(input);
-     });
+     var wrapper = document.createElement("div");
+     wrapper.className = "phone-input-wrapper";
+
+     var prefix = document.createElement("span");
+     prefix.className = "phone-prefix";
+     prefix.textContent = "+1";
+
+     var visible = document.createElement("input");
+     visible.type = "tel";
+     visible.id = "formatted-newPhone";
+     visible.className = "phone-visible";
+     visible.placeholder = "123 456 7890";
+     visible.setAttribute("inputmode", "numeric");
+     visible.setAttribute("autocomplete", "tel-national");
+
+     wrapper.appendChild(prefix);
+     wrapper.appendChild(visible);
+     hidden.parentNode.insertBefore(wrapper, hidden);
+
+     function sync() {
+      var digits = extractDigits(visible.value);
+      visible.value = formatDisplay(digits);
+      hidden.value = digits ? "+1" + digits : "";
+     }
+
+     // Prefill from the phoneHint default already placed in #newPhone.
+     var initial = extractDigits(hidden.value);
+     if (initial) {
+      visible.value = formatDisplay(initial);
+      hidden.value = "+1" + initial;
+     }
+
+     visible.addEventListener("input", sync);
+     visible.addEventListener("change", sync);
     }
 
     function init() {
-     var input = getInput();
-     if (input) {
-      attach(input);
+     var hidden = document.getElementById("newPhone");
+     if (hidden) {
+      build(hidden);
       return;
      }
 
      var observer = new MutationObserver(function () {
-      var found = getInput();
+      var found = document.getElementById("newPhone");
       if (found) {
        observer.disconnect();
-       attach(found);
+       build(found);
       }
      });
      observer.observe(document.body, { childList: true, subtree: true });
