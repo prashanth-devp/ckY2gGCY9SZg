@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Confirm your email</title>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+          href="https://fonts.googleapis.com/css2?family=Rethink+Sans:ital,wght@0,400..800;1,400..800&display=swap"
+          rel="stylesheet"
+  />
+  <link rel="stylesheet" href="https://prashanth-devp.github.io/ckY2gGCY9SZg/assets/css/common.css" />
+  <!-- Same email verification behaviour as sign-up (verify-signin.js), but NO back.js:
+       the email link/change flow has no previous user-facing step, so there is no Back button. -->
+  <script src="https://prashanth-devp.github.io/ckY2gGCY9SZg/assets/scripts/verify-signin.js"></script>
+  <script src="https://prashanth-devp.github.io/ckY2gGCY9SZg/assets/scripts/shared.js"></script>
+  <style>
+    body {
+      margin: 0;
+      font-family: "Rethink Sans", sans-serif;
+    }
+
+    #opal-main {
+      background-image: url("https://prashanth-devp.github.io/ckY2gGCY9SZg/assets/images/landingBackground.png");
+      height: 100vh;
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem 2rem;
+      background-color: white;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    }
+
+    .headline {
+      margin: 2rem 0;
+      font-size: 40px;
+      line-height: 44px;
+      font-weight: 700;
+      text-align: center;
+      letter-spacing: -0.02em;
+      background: linear-gradient(95.65deg, #4593a7 0%, #359963 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .container {
+      background-color: white;
+      box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+      padding: 2rem 2rem 0.5rem 2rem;
+      max-width: 400px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .heading {
+      font-size: 1.5rem; font-weight: 400; margin: 0;
+    }
+
+    .intro {
+      color: #6b7280; margin-top: 0.25rem;
+    }
+
+    .intro p {
+      margin-top: 6px;
+    }
+
+    .input-wrapper {
+      margin-bottom: 1.5rem;
+    }
+
+    label {
+      display: block;
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: #111827;
+    }
+
+    input {
+      width: 100%;
+      border: none;
+      border-bottom: 1px solid #111827;
+      background-color: transparent;
+      font-size: 1rem;
+      color: #111827;
+      box-sizing: border-box;
+      padding: 1rem;
+    }
+
+    input::placeholder {
+      color: #9ca3af;
+      font-size: 1rem;
+    }
+
+    input:focus {
+      outline: none;
+    }
+
+    #api button {
+      width: 100%;
+      background-color: rgb(47 125 146 / var(--tw-bg-opacity, 1));
+      color: white;
+      font-weight: 700;
+      padding: 0.75rem;
+      border: none;
+      cursor: pointer;
+      transition: background-color 0.2s ease-in-out;
+      height: 56px;
+    }
+
+    .btn:hover {
+      background-color: rgb(47 125 146 / var(--tw-bg-opacity, 1));
+    }
+
+    .link {
+      color: rgb(47 125 146 / var(--tw-bg-opacity, 1));
+      font-weight: 500;
+      font-size: 0.875rem;
+      text-decoration: none;
+    }
+
+    .link:hover {
+      text-decoration: underline;
+    }
+
+    .separator {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      margin: 1rem 0;
+      color: #9ca3af;
+      font-size: 0.875rem;
+    }
+
+    .separator hr {
+      flex: 1;
+      border: none;
+      border-top: 1px solid #d1d5db;
+    }
+
+    .error {
+      color: #ef4444;
+      font-size: 0.875rem;
+      margin-top: 0.5rem;
+    }
+
+    #api .heading h1{
+      font-size: 1.5rem;
+      font-weight: 400;
+      margin: 0;
+    }
+
+    #api .intro h2{
+      color: #6b7280;
+      margin-top: 0.25rem;
+      font-size: 1em;
+      font-weight: normal;
+      margin-block-end: 1.5em;
+    }
+
+    #api .entry-item {
+      margin-bottom: 16px;
+    }
+
+    #api .divider {
+      display: none;
+    }
+
+    #api .create {
+      display: none;
+    }
+
+    #api #forgotPassword {
+      display: none;
+    }
+
+    .flex {
+      display: flex !important;
+    }
+    .none {
+      display: none !important;
+    }
+
+    #api .gaIdOpal_li {
+      display: none !important;
+    }
+
+    #api #verifying_blurb {
+      display: none !important;
+    }
+
+    #api #emailVerificationControl_success_message {
+      display: none !important;
+    }
+
+    #api #emailVerificationControl_but_change_claims {
+      display: none !important;
+    }
+
+    #api form#attributeVerification > .buttons {
+      display: none;
+      flex-direction: row-reverse;
+      gap: 6px;
+    }
+
+    #api a.helpLink.tiny {
+      display: none;
+    }
+
+    #api div#attributeList ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    #api .attrEntry {
+      margin: 16px 0;
+    }
+
+    #api .newPassword_li {
+      display: none;
+    }
+
+    #api .reenterPassword_li {
+      display: none;
+    }
+
+    #api .buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    #api .sendNewCode {
+      background: white;
+      color: #5A6A72;
+      border: 1px solid #5A6A72;
+    }
+
+    @keyframes spin-ease {
+      0% { transform: rotate(0deg); animation-timing-function: ease-in; }
+      50% { transform: rotate(180deg); animation-timing-function: ease-out; }
+      100% { transform: rotate(360deg); }
+    }
+
+    .spinner {
+      margin: 0 auto;
+      width: 35px;
+      height: 30px;
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-position: center;
+      animation: spin-ease 1s infinite;
+    }
+  </style>
+</head>
+<body>
+<div id="opal-main">
+  <header>
+    <img
+            src="https://prashanth-devp.github.io/ckY2gGCY9SZg/assets/images/logo.svg"
+            alt="Logo"
+            style="height: 1.5rem"
+    />
+  </header>
+
+  <div class="p-4">
+    <h1 class="headline">See clearly, shop simply with Opal</h1>
+
+    <div class="container unified_container" role="presentation">
+
+      <div id="api"></div>
+
+      <!-- Errors area -->
+      <div id="error" class="error"></div>
+    </div>
+  </div>
+</div>
+<script>
+  // Force the email input placeholder to "Enter email" while the field label stays
+  // "Your email" (B2C ties the placeholder to the claim DisplayName, so this is the only
+  // way to make the two differ). Guarded so re-applying never loops.
+  (function () {
+    function apply(el) {
+      if (el.getAttribute('placeholder') !== 'Enter email') {
+        el.setAttribute('placeholder', 'Enter email');
+      }
+    }
+    function init() {
+      var el = document.getElementById('email');
+      if (!el) return false;
+      apply(el);
+      new MutationObserver(function () { apply(el); })
+        .observe(el, { attributes: true, attributeFilter: ['placeholder'] });
+      return true;
+    }
+    if (!init()) {
+      var obs = new MutationObserver(function () { if (init()) obs.disconnect(); });
+      obs.observe(document.body, { childList: true, subtree: true });
+    }
+  })();
+</script>
+</body>
+</html>
+ 
