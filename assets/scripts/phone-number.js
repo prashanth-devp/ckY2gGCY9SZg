@@ -40,80 +40,57 @@ $(document).ready(async function () {
     formattedPhoneInput.id = 'formatted-phone';
     formattedPhoneInput.className = 'textInput';
     formattedPhoneInput.type = 'text';
-    formattedPhoneInput.placeholder = '(123) 456-6789';
+    formattedPhoneInput.placeholder = '+1 123 456 7890';
     formattedPhoneInput.title = 'Enter phone';
     formattedPhoneInput.autofocus = true;
 
     // Insert the new input before the hidden one
     originalPhoneInput.parentNode.insertBefore(formattedPhoneInput, originalPhoneInput);
 
-    // Function to format phone number as (123) 456-7890
+    // Pull the 10-digit national number out of whatever is in the field. A
+    // leading "1" is treated as the country code (and dropped) only when it's
+    // clearly one — the value starts with "+1" or there are 11 digits — so a
+    // user typing an area code that happens to start with "1" isn't mangled.
+    // Mirrors extractPhoneDigits in collect-identifier.js.
+    function extractNationalDigits(value) {
+        var digits = value.replace(/\D/g, '');
+        var despaced = value.replace(/\s/g, '');
+        if (digits.length > 0 && digits.indexOf('1') === 0 && (despaced.indexOf('+1') === 0 || digits.length === 11)) {
+            digits = digits.slice(1);
+        }
+        return digits.slice(0, 10);
+    }
+
+    // Format the national number as "+1 123 456 7890", building it up
+    // incrementally so partial input formats cleanly while typing.
     function formatPhoneNumber(value) {
-        // Remove all non-digit characters
-        const digits = value.replace(/\D/g, '');
-
-        // Format the phone number
-        if (digits.length <= 3) {
-            return digits.length ? `(${digits}` : '';
-        } else if (digits.length <= 6) {
-            return `(${digits.slice(0, 3)}) ${digits.slice(3)}`;
-        } else {
-            return `(${digits.slice(0, 3)}) ${digits.slice(3, 6)}-${digits.slice(6, 10)}`;
-        }
+        var digits = extractNationalDigits(value);
+        if (!digits.length) return '';
+        if (digits.length <= 3) return '+1 ' + digits;
+        if (digits.length <= 6) return '+1 ' + digits.slice(0, 3) + ' ' + digits.slice(3);
+        return '+1 ' + digits.slice(0, 3) + ' ' + digits.slice(3, 6) + ' ' + digits.slice(6);
     }
 
-    // Function to update the hidden input with +1 format
+    // Keep the hidden B2C-bound input in clean E.164 (+1XXXXXXXXXX).
     function updateHiddenInput(formattedValue) {
-        // Extract digits only
-        const digits = formattedValue.replace(/\D/g, '');
-
-        // Only update if we have digits
-        if (digits.length > 0) {
-            // Format as +1 followed by digits
-            originalPhoneInput.value = `+1${digits}`;
-        } else {
-            originalPhoneInput.value = '';
-        }
+        var digits = extractNationalDigits(formattedValue);
+        originalPhoneInput.value = digits.length > 0 ? '+1' + digits : '';
     }
 
-    // Add event listener to format the input and update hidden field
-    formattedPhoneInput.addEventListener('input', function(e) {
-        // Get current cursor position and value before formatting
-        const cursorPos = this.selectionStart;
-        const oldValue = this.value;
-        const oldLength = oldValue.length;
-
-        // Count digits before cursor in the old value
-        const digitCountBeforeCursor = oldValue.substring(0, cursorPos).replace(/\D/g, '').length;
-
-        // Format the phone number
-        const formattedValue = formatPhoneNumber(this.value);
+    // Reformat as the user types and mirror the clean value into the hidden
+    // field. The caret is moved to the end after formatting (matches the
+    // behavior in collect-identifier.js) — simplest reliable option once the
+    // fixed "+1 " prefix is in play.
+    formattedPhoneInput.addEventListener('input', function () {
+        var formattedValue = formatPhoneNumber(this.value);
         this.value = formattedValue;
-
-        // Update the hidden input
         updateHiddenInput(formattedValue);
-
-        // Calculate new cursor position based on digit count
-        let newPos = 0;
-        let currentDigitCount = 0;
-
-        // Iterate through the formatted value to find the position after the same number of digits
-        for (let i = 0; i < formattedValue.length; i++) {
-            if (/\d/.test(formattedValue[i])) {
-                currentDigitCount++;
-            }
-            if (currentDigitCount > digitCountBeforeCursor) {
-                break;
-            }
-            newPos = i + 1;
-        }
-
-        // Set cursor position
-        this.setSelectionRange(newPos, newPos);
+        var len = this.value.length;
+        this.setSelectionRange(len, len);
     });
 
-    // Handle initial value if any
+    // Handle initial value if any (e.g. a pre-filled "+1XXXXXXXXXX").
     if (originalPhoneInput.value) {
-        formattedPhoneInput.value = formatPhoneNumber(originalPhoneInput.value.replace(/^\+1/, ''));
+        formattedPhoneInput.value = formatPhoneNumber(originalPhoneInput.value);
     }
 });

@@ -13,7 +13,7 @@
   var e164 = '+1' + digits;
 
   function formatted(d) {
-    return '(' + d.slice(0, 3) + ') ' + d.slice(3, 6) + '-' + d.slice(6, 10);
+    return '+1 ' + d.slice(0, 3) + ' ' + d.slice(3, 6) + ' ' + d.slice(6, 10);
   }
 
   function setNativeValue(input, value) {
