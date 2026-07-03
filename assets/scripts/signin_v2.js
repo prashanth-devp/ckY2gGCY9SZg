@@ -64,6 +64,11 @@ function nationalDigits(value) {
 // mirroring how verify-signin.js consumes b2c_collected_email.
 const COLLECTED_PHONE_KEY = 'b2c_collected_phone';
 
+// Key the phone OTP screen (prefill-phone-signin.js) writes a send-stage
+// failure into before routing back here, so the message shows on the sign-in
+// screen instead of stranding the user on the OTP page.
+const COLLECTED_ERROR_KEY = 'b2c_signin_error';
+
 function showIdentifierError(message) {
   $('#error').text(message).show();
 }
@@ -326,9 +331,19 @@ function setupIdentifierFirst(elements) {
   // If ADB2C re-rendered the page after a failed sign-in it preserves the
   // entered username (or a login_hint pre-fills it). Skip straight to the
   // password step in that case so the user isn't bounced back to step 1.
+  // A send-stage failure on the phone OTP screen routes the user back here with
+  // the message stashed in sessionStorage (see prefill-phone-signin.js).
+  let carriedSignInError = '';
+  try {
+    carriedSignInError = sessionStorage.getItem(COLLECTED_ERROR_KEY) || '';
+    if (carriedSignInError) sessionStorage.removeItem(COLLECTED_ERROR_KEY);
+  } catch (e) {}
+
   const hasPrefilledIdentifier = signInName.value && signInName.value.trim().length > 0;
   const hasPageError = $('.pageLevel .error').filter(':visible').length > 0;
-  const startOnPasswordStep = hasPrefilledIdentifier || hasPageError;
+  // When we came back carrying a phone send-error, keep the user on the
+  // identifier step (they arrived via phone, not password) and show it there.
+  const startOnPasswordStep = !carriedSignInError && (hasPrefilledIdentifier || hasPageError);
 
   // Build the Continue button (inherits the #api button styling).
   const continueBtn = document.createElement('button');
@@ -347,6 +362,15 @@ function setupIdentifierFirst(elements) {
     setForgotHidden(true);
     next.classList.add('none');
     if (phoneExchange) phoneExchange.classList.add('none');
+  }
+
+  if (carriedSignInError) {
+    // Re-format a carried-back phone number for display on the identifier step.
+    if (signInName.value && !/[a-zA-Z@]/.test(signInName.value)) {
+      const national = nationalDigits(signInName.value);
+      if (national) signInName.value = formatPhoneDisplay(national);
+    }
+    showIdentifierError(carriedSignInError);
   }
 
   continueBtn.addEventListener('click', function () {
