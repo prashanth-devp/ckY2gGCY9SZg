@@ -108,6 +108,19 @@
       outline: none;
     }
 
+    /* Primary button (Send verification code / Login to opal) — teal, full-width. */
+    #api button {
+      width: 100%;
+      height: 56px;
+      background-color: rgb(47 125 146 / var(--tw-bg-opacity, 1));
+      color: white;
+      font-weight: 700;
+      padding: 0.75rem;
+      border: none;
+      cursor: pointer;
+      transition: background-color 0.2s ease-in-out;
+    }
+
      #api .buttons {
       display: flex;
       flex-direction: column;
@@ -255,12 +268,6 @@
       display: flex;
       flex-direction: row-reverse;
       gap: 10px;
-    }
-
-    #api .sendNewCode {
-      background: white;
-      color: #5A6A72;
-      border: 1px solid #5A6A72;
     }
 
   </style>
