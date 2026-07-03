@@ -39,6 +39,27 @@ function toE164(value) {
   return digits.length === 10 ? '+1' + digits : '';
 }
 
+// Render national digits as the display format "+1 123 456 7890", building the
+// string up incrementally so partial input formats cleanly while typing.
+function formatPhoneDisplay(national) {
+  var out = '+1';
+  if (national.length > 0) out += ' ' + national.slice(0, 3);
+  if (national.length > 3) out += ' ' + national.slice(3, 6);
+  if (national.length > 6) out += ' ' + national.slice(6, 10);
+  return out;
+}
+
+// Extract the 10-digit national number from whatever is in the field, dropping a
+// leading country-code "1" (NANP area codes never start with 1, so a leading 1
+// is always the country code — including the one our own "+1" prefix re-adds).
+function nationalDigits(value) {
+  var digits = value.replace(/\D/g, '');
+  if (digits.charAt(0) === '1') {
+    digits = digits.slice(1);
+  }
+  return digits.slice(0, 10);
+}
+
 // Key the phone-collect page (phone-number.js) reads to pre-fill + auto-advance,
 // mirroring how verify-signin.js consumes b2c_collected_email.
 const COLLECTED_PHONE_KEY = 'b2c_collected_phone';
@@ -268,6 +289,17 @@ function setupIdentifierFirst(elements) {
   const signInLabel = document.querySelector('[for="signInName"]');
   if (signInLabel) signInLabel.textContent = 'Your email or phone number';
   signInName.setAttribute('placeholder', 'Your email or phone number');
+
+  // Live-format the value as "+1 123 456 7890" while typing, but only when the
+  // input looks like a phone number. As soon as it contains a letter or "@" we
+  // leave it untouched so email entry keeps working.
+  signInName.addEventListener('input', function () {
+    const value = signInName.value;
+    if (!value || /[a-zA-Z@]/.test(value)) return;
+    const national = nationalDigits(value);
+    if (!national) return; // nothing to format yet — allow clearing / switching to email
+    signInName.value = formatPhoneDisplay(national);
+  });
 
   function revealPasswordStep() {
     setPasswordHidden(false);
