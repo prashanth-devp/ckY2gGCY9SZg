@@ -275,6 +275,20 @@ function setupIdentifierFirst(elements) {
     if (target) target.classList[hidden ? 'add' : 'remove']('none');
   }
 
+  // Carry the email the user just typed into the forgot-password sub-journey so
+  // the "verify email" reset screen can pre-fill it instead of asking again
+  // (verify-forgot.js consumes b2c_collected_email, same key as verify-signin.js).
+  // "Forgot password?" is only reachable from the email/password step, so the
+  // identifier here is always an email, not a phone number.
+  if (forgotPassword) {
+    forgotPassword.addEventListener('click', function () {
+      const value = signInName.value.trim();
+      if (isValidEmail(value)) {
+        try { sessionStorage.setItem('b2c_collected_email', value); } catch (e) {}
+      }
+    });
+  }
+
   // Prefer the dedicated .entry-item wrapper; never fall back to a parent that
   // could be the whole form (that would hide the identifier field too).
   const passwordItem = password.closest('.entry-item');

@@ -68,6 +68,38 @@ $(document).ready(function () {
         $('.intro').addClass('none');
     });
 
+    // Pre-fill the email carried over from the sign-in screen (signin_v2.js
+    // stashes it on "Forgot password?"), so the user isn't asked to re-type the
+    // address they already entered. Mirrors verify-signin.js: fill #email, hide
+    // the email row, and auto-send the verification code.
+    waitForElementVisible('#emailVerificationControl_but_send_code').then(function () {
+        var emailVal = $('#email').val();
+        if (emailVal && emailVal.length) {
+            return;
+        }
+        var stored;
+        try { stored = sessionStorage.getItem('b2c_collected_email'); } catch (e) {}
+        if (!stored) {
+            return;
+        }
+        try { sessionStorage.removeItem('b2c_collected_email'); } catch (e) {}
+
+        var emailInput = document.getElementById('email');
+        if (!emailInput) {
+            return;
+        }
+        var nativeSetter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value').set;
+        nativeSetter.call(emailInput, stored);
+        emailInput.dispatchEvent(new Event('input', { bubbles: true }));
+        emailInput.dispatchEvent(new Event('change', { bubbles: true }));
+
+        $('.email_li').addClass('none');
+        $('.intro').addClass('none');
+        setTimeout(function () {
+            $('#emailVerificationControl_but_send_code').click();
+        }, 500);
+    });
+
     $('#emailVerificationControl_but_verify_code').on('click', async function () {
         await waitForElementVisible('#emailVerificationControl_but_change_claims');
 
