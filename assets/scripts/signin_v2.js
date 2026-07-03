@@ -287,7 +287,7 @@ function setupIdentifierFirst(elements) {
 
   // Relabel the identifier field so it accepts email OR phone.
   const signInLabel = document.querySelector('[for="signInName"]');
-  if (signInLabel) signInLabel.textContent = 'Your email or phone number';
+  if (signInLabel) signInLabel.textContent = 'Your email or phone number*';
   signInName.setAttribute('placeholder', 'Your email or phone number');
 
   // Live-format the value as "+1 123 456 7890" while typing, but only when the
