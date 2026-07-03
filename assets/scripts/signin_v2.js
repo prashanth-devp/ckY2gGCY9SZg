@@ -290,6 +290,16 @@ function setupIdentifierFirst(elements) {
   if (signInLabel) signInLabel.textContent = 'Your email or phone number*';
   signInName.setAttribute('placeholder', 'Your email or phone number');
 
+  // Surface validation errors ABOVE the identifier field (top of the form)
+  // rather than at the bottom of the card. #error lives outside #api by
+  // default; insertBefore moves it in front of the field's wrapper.
+  const errorEl = document.getElementById('error');
+  const signInItem = signInName.closest('.entry-item') || signInName.parentNode;
+  if (errorEl && signInItem && signInItem.parentNode) {
+    errorEl.style.marginBottom = '0.5rem';
+    signInItem.parentNode.insertBefore(errorEl, signInItem);
+  }
+
   // Live-format the value as "+1 123 456 7890" while typing, but only when the
   // input looks like a phone number. As soon as it contains a letter or "@" we
   // leave it untouched so email entry keeps working.
