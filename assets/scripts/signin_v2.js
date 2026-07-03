@@ -290,14 +290,17 @@ function setupIdentifierFirst(elements) {
   if (signInLabel) signInLabel.textContent = 'Your email or phone number*';
   signInName.setAttribute('placeholder', 'Your email or phone number');
 
-  // Surface validation errors ABOVE the identifier field (top of the form)
-  // rather than at the bottom of the card. #error lives outside #api by
-  // default; insertBefore moves it in front of the field's wrapper.
+  // Surface validation errors ABOVE the identifier label/field rather than at
+  // the bottom of the card. #error lives outside #api by default; insertBefore
+  // moves it in front of the anchor (works across parents). Anchor on the
+  // field's .entry-item so the error sits above the "Your email or phone
+  // number*" label, falling back to the label or the input itself.
   const errorEl = document.getElementById('error');
-  const signInItem = signInName.closest('.entry-item') || signInName.parentNode;
-  if (errorEl && signInItem && signInItem.parentNode) {
+  const errorAnchor = signInName.closest('.entry-item') || signInLabel || signInName;
+  if (errorEl && errorAnchor && errorAnchor.parentNode) {
     errorEl.style.marginBottom = '0.5rem';
-    signInItem.parentNode.insertBefore(errorEl, signInItem);
+    errorEl.style.marginTop = '0';
+    errorAnchor.parentNode.insertBefore(errorEl, errorAnchor);
   }
 
   // Live-format the value as "+1 123 456 7890" while typing, but only when the
