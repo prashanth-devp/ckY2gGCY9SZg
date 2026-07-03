@@ -13,9 +13,10 @@
           rel="stylesheet"
   />
   <link rel="stylesheet" href="https://prashanth-devp.github.io/ckY2gGCY9SZg/assets/css/common.css" />
-  <!-- Same email verification behaviour as sign-up (verify-signin.js), but NO back.js:
-       the email link/change flow has no previous user-facing step, so there is no Back button. -->
-  <script src="https://prashanth-devp.github.io/ckY2gGCY9SZg/assets/scripts/verify-signin.js"></script>
+  <!-- verify-email-change.js is verify-signin.js with ONLY the auto-send block removed, so the
+       prepopulated email stays on screen for the user to review/edit and send themselves (no
+       Back button here — the email link/change flow has no previous user-facing step). -->
+  <script src="https://prashanth-devp.github.io/ckY2gGCY9SZg/assets/scripts/verify-email-change.js"></script>
   <script src="https://prashanth-devp.github.io/ckY2gGCY9SZg/assets/scripts/shared.js"></script>
   <style>
     body {
@@ -309,42 +310,6 @@
       var obs = new MutationObserver(function () { if (init()) obs.disconnect(); });
       obs.observe(document.body, { childList: true, subtree: true });
     }
-  })();
-
-  // The email field is prepopulated (from emailHint), and verify-signin.js auto-clicks
-  // "Send verification code" whenever the email is prefilled — which would skip this screen
-  // and jump straight to code entry. Here we let the user review/edit the prefilled email and
-  // send it themselves: block the programmatic (untrusted) auto-send, and keep the email field
-  // visible until the user performs a real send. Real (trusted) clicks pass through untouched.
-  (function () {
-    var SEND_ID = 'emailVerificationControl_but_send_code';
-    var userInitiatedSend = false;
-
-    document.addEventListener(
-      'click',
-      function (e) {
-        var btn = document.getElementById(SEND_ID);
-        if (!btn || (e.target !== btn && !btn.contains(e.target))) return;
-        if (e.isTrusted) {
-          userInitiatedSend = true;
-        } else {
-          e.preventDefault();
-          e.stopImmediatePropagation();
-        }
-      },
-      true,
-    );
-
-    var keepVisible = new MutationObserver(function () {
-      if (userInitiatedSend) {
-        keepVisible.disconnect();
-        return;
-      }
-      document.querySelectorAll('.email_li.none, .intro.none').forEach(function (el) {
-        el.classList.remove('none');
-      });
-    });
-    keepVisible.observe(document.body, { attributes: true, subtree: true, attributeFilter: ['class'] });
   })();
 </script>
 </body>
