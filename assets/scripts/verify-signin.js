@@ -188,7 +188,7 @@ $(document).ready(function () {
     }
   });
 
-  $('#emailVerificationControl_but_send_code').on('click', async function () {
+  $(document).on('click', '#emailVerificationControl_but_send_code', async function () {
     await waitForElementVisible('.verificationCode_li');
 
     $('#api').show();
@@ -202,11 +202,11 @@ $(document).ready(function () {
     startResendTimer();
   });
 
-  $('#emailVerificationControl_but_send_new_code').on('click', function () {
+  $(document).on('click', '#emailVerificationControl_but_send_new_code', function () {
     startResendTimer();
   });
 
-  $('#emailVerificationControl_but_verify_code').on('click', async function () {
+  $(document).on('click', '#emailVerificationControl_but_verify_code', async function () {
     await waitForElement('#emailVerificationControl_success_message');
 
     var rePassword = $('.reenterPassword_li');
