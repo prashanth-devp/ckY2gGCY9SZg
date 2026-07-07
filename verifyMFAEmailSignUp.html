@@ -255,14 +255,26 @@
 
     #api .buttons {
       display: flex;
-      flex-direction: row-reverse;
+      flex-direction: column;
+      align-items: stretch;
       gap: 10px;
     }
 
+    /* Tertiary/Small button (Figma "Resend code"): full-width white bg, teal bold text, 40px tall.
+       Overrides the primary #api button styles above. */
     #api .sendNewCode {
-      background: white;
-      color: #5A6A72;
-      border: 1px solid #5A6A72;
+      width: 100%;                 /* self-stretch */
+      min-width: 9rem;             /* min-w-36 */
+      height: 2.5rem;              /* h-10 */
+      min-height: 2.5rem;          /* min-h-10 */
+      max-height: 2.5rem;          /* max-h-10 */
+      padding: 0.5rem 0;           /* py-2 */
+      background: white;           /* bg-white */
+      color: rgb(47 125 146 / var(--tw-bg-opacity, 1)); /* text-Content-Tertiary-Default */
+      font-size: 1rem;             /* text-base */
+      font-weight: 700;            /* font-bold */
+      line-height: 1.5rem;         /* leading-6 */
+      border: none;
     }
 
   </style>
