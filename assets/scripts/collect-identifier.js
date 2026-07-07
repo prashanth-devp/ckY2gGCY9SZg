@@ -88,10 +88,9 @@ $(document).ready(function () {
     }
 
     // "Already have an account? / Sign in to your account" — mirrors the sign-in
-    // screen's "Don't have an account?" separator+link (see signin.js). This
-    // (first) signup screen is reached from sign-in via a full-page
-    // flow_hint=sign_up navigation, so history.back() returns to sign-in — the
-    // same mechanism the header "Back" control uses (back.js).
+    // screen's "Don't have an account?" separator+link (see signin.js). Clicking
+    // it re-issues the authorize URL without flow_hint (navigateToSignIn, shared.js),
+    // which always restarts the journey at the sign-in first screen (Sub.Login).
     function addSignInLink() {
         if (document.getElementById('signInLink')) return;
         var api = document.getElementById('api');
@@ -110,7 +109,7 @@ $(document).ready(function () {
         link.style.textAlign = 'center';
         link.addEventListener('click', function (e) {
             e.preventDefault();
-            window.history.back();
+            navigateToSignIn();
         });
 
         api.appendChild(separator);

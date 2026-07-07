@@ -24,6 +24,15 @@ function navigateToSignUp() {
   window.location.href = url.toString();
 }
 
+function navigateToSignIn() {
+  // Reads the current B2C authorize URL and re-issues it WITHOUT flow_hint, which
+  // restarts the journey at Sub.Login (the sign-in first screen). CTX-Init resets
+  // all route claims to false on a fresh authorize, so this always lands on sign-in.
+  var url = new URL(window.location.href);
+  url.searchParams.delete("flow_hint");
+  window.location.href = url.toString();
+}
+
 $(document).ready(function () {
   addRequiredSign();
 
