@@ -87,8 +87,39 @@ $(document).ready(function () {
         observer.observe(document.body, { childList: true, subtree: true });
     }
 
+    // "Already have an account? / Sign in to your account" — mirrors the sign-in
+    // screen's "Don't have an account?" separator+link (see signin.js). This
+    // (first) signup screen is reached from sign-in via a full-page
+    // flow_hint=sign_up navigation, so history.back() returns to sign-in — the
+    // same mechanism the header "Back" control uses (back.js).
+    function addSignInLink() {
+        if (document.getElementById('signInLink')) return;
+        var api = document.getElementById('api');
+        if (!api) return;
+
+        var separator = document.createElement('div');
+        separator.className = 'separator';
+        separator.innerHTML = '<hr />Already have an account?<hr />';
+
+        var link = document.createElement('a');
+        link.id = 'signInLink';
+        link.href = '#';
+        link.className = 'link';
+        link.textContent = 'Sign in to your account';
+        link.style.display = 'block';
+        link.style.textAlign = 'center';
+        link.addEventListener('click', function (e) {
+            e.preventDefault();
+            window.history.back();
+        });
+
+        api.appendChild(separator);
+        api.appendChild(link);
+    }
+
     waitForInput(function (emailInput) {
         emailInput.removeAttribute('pattern');
+        addSignInLink();
 
         var patternObserver = new MutationObserver(function () {
             if (emailInput.hasAttribute('pattern')) {
