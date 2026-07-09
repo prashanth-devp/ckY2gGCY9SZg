@@ -22,11 +22,15 @@ $(document).ready(function () {
     if (resendTimerInterval) clearInterval(resendTimerInterval);
 
     var $btn = $('#emailVerificationControl_but_send_new_code');
-    var label = $btn.text().replace(/\s*\(\d+s\)$/, '').trim() || 'Resend code';
+    var label =
+      $btn
+        .text()
+        .replace(/\s*\(\d+s\)$/, '')
+        .trim() || 'Resend code';
     var remaining = 60;
 
     $btn.text(label + ' (' + remaining + 's)');
-    $btn.css({ 'pointer-events': 'none', 'opacity': '0.6' });
+    $btn.css({ 'pointer-events': 'none', opacity: '0.6' });
 
     resendTimerInterval = setInterval(function () {
       remaining--;
@@ -34,7 +38,7 @@ $(document).ready(function () {
         clearInterval(resendTimerInterval);
         resendTimerInterval = null;
         $btn.text(label);
-        $btn.css({ 'pointer-events': '', 'opacity': '' });
+        $btn.css({ 'pointer-events': '', opacity: '' });
       } else {
         $btn.text(label + ' (' + remaining + 's)');
       }
@@ -132,9 +136,13 @@ $(document).ready(function () {
 
     if (!phoneValue) {
       var stored;
-      try { stored = sessionStorage.getItem('b2c_collected_phone'); } catch (e) {}
+      try {
+        stored = sessionStorage.getItem('b2c_collected_phone');
+      } catch (e) {}
       if (stored) {
-        try { sessionStorage.removeItem('b2c_collected_phone'); } catch (e) {}
+        try {
+          sessionStorage.removeItem('b2c_collected_phone');
+        } catch (e) {}
         var phoneInput = $phone[0];
         if (phoneInput) {
           var nativeSetter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value').set;
@@ -153,7 +161,9 @@ $(document).ready(function () {
         $('#phoneVerificationControl_but_send_code').click();
       }, 300);
       waitForButtonEnabled('continue').then(function (button) {
-        setTimeout(function () { button.click(); }, 0);
+        setTimeout(function () {
+          button.click();
+        }, 0);
         waitForElementVisible('#claimVerificationServerError').then(function () {
           $('#api').show();
         });
@@ -161,7 +171,9 @@ $(document).ready(function () {
       return;
     }
 
-    $('.container').append('<div id="loading-indicator" style="text-align:center;padding:2rem;"><div class="spinner"></div></div>');
+    $('.container').append(
+      '<div id="loading-indicator" style="text-align:center;padding:2rem;"><div class="spinner"></div></div>',
+    );
 
     var skipTimeout = setTimeout(function () {
       $('#loading-indicator').remove();
@@ -239,6 +251,11 @@ $(document).ready(function () {
     var newPassword = $('.newPassword_li');
 
     if (rePassword.length && newPassword.length) {
+      var emailControl = document.getElementById('emailVerificationControl');
+      var emailVerified = $('#emailVerificationControl_success_message').is(':visible');
+      if (emailControl && !emailVerified) {
+        return;
+      }
       $('#emailVerificationControl_success_message').hide();
       $('.emailVerificationCode_li').addClass('none');
       $('#emailVerificationControl').addClass('none');
@@ -252,7 +269,9 @@ $(document).ready(function () {
       return;
     }
 
-    $('.container').append('<div id="loading-indicator" style="text-align:center;padding:2rem;"><div class="spinner"></div></div>');
+    $('.container').append(
+      '<div id="loading-indicator" style="text-align:center;padding:2rem;"><div class="spinner"></div></div>',
+    );
     setTimeout(function () {
       button.click();
     }, 0);
@@ -275,7 +294,7 @@ $(document).ready(function () {
           emailVal = stored;
           sessionStorage.removeItem('b2c_collected_email');
         }
-      } catch(ex) {}
+      } catch (ex) {}
     }
     if (emailVal && emailVal.length) {
       var verifyCodeLi = document.querySelector('.verificationCode_li');
@@ -308,3 +327,4 @@ $(document).ready(function () {
     }
   });
 });
+ 
