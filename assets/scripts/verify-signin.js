@@ -55,6 +55,25 @@ $(document).ready(function () {
     startResendTimer();
   }
 
+  function applyPasswordStepCopy() {
+    $('#api h1').text('Add a new password to your account');
+
+    var $intro = $('#api .intro');
+    if (!$intro.length) {
+      var $heading = $('#api .heading');
+      $intro = $('<div class="intro"></div>');
+      if ($heading.length) {
+        $intro.insertAfter($heading);
+      } else {
+        $intro.insertAfter($('#api h1'));
+      }
+    }
+    $intro.html('<h2>Enter a password for your Opal account below</h2>').removeClass('none');
+
+    var $newPasswordLabel = $('#newPassword_label');
+    $newPasswordLabel.text($newPasswordLabel.text().replace(/^New password/, 'Create password'));
+  }
+
   function waitForElement(selector) {
     return new Promise((resolve) => {
       if (document.querySelector(selector)) {
@@ -280,7 +299,7 @@ $(document).ready(function () {
       $('.emailVerificationCode_li').addClass('none');
       $('#emailVerificationControl').addClass('none');
       $('.email_li').addClass('none');
-      $('#api h1').text('Add a password to your account');
+      applyPasswordStepCopy();
       rePassword.show();
       newPassword.show();
       $('#continue').show();
@@ -311,7 +330,7 @@ $(document).ready(function () {
       $('.emailVerificationCode_li').addClass('none');
       $('#emailVerificationControl').addClass('none');
       $('.email_li').addClass('none');
-      $('#api h1').text('Add a password to your account');
+      applyPasswordStepCopy();
       rePassword.show();
       newPassword.show();
       $('#attributeVerification > .buttons').css('display', 'flex');
