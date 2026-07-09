@@ -212,6 +212,10 @@ $(document).ready(function () {
     $('.email_li').addClass('none');
     $('.intro').addClass('none');
     startResendTimer();
+
+    if ($('.reenterPassword_li').length && $('.newPassword_li').length) {
+      $('#continue').hide();
+    }
   });
 
   $(document).on('click', '#emailVerificationControl_but_send_new_code', function () {
@@ -232,6 +236,7 @@ $(document).ready(function () {
       $('#api h1').text('Add a password to your account');
       rePassword.show();
       newPassword.show();
+      $('#continue').show();
       $('#attributeVerification > .buttons').css('display', 'flex');
     }
   });
