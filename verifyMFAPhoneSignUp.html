@@ -311,18 +311,5 @@
     </div>
   </div>
 </div>
-<script>
-  // Relabel the shared back.js link to "Back to Sign up" on this page only.
-  (function () {
-    var observer = new MutationObserver(function () {
-      var label = document.querySelector('.back-button span');
-      if (label && label.textContent.trim() !== 'Back to Sign up') {
-        label.textContent = 'Back to Sign up';
-        observer.disconnect();
-      }
-    });
-    observer.observe(document.body, { childList: true, subtree: true });
-  })();
-</script>
 </body>
 </html>
