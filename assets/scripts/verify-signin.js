@@ -55,6 +55,30 @@ $(document).ready(function () {
     startResendTimer();
   }
 
+  function setPasswordLabel(selector, text) {
+    var $label = $(selector);
+    if (!$label.length) return;
+    var suffix = /\*\s*$/.test($label.text()) ? '*' : '';
+    $label.text(text + suffix);
+  }
+
+  function getPasswordRequirementsText() {
+    var fallback =
+      'Your password must be 8+ characters long with uppercase characters, lowercase characters and numbers (0-9)';
+    try {
+      var blocks = (window.SA_FIELDS && window.SA_FIELDS.AttributeFields) || [];
+      for (var i = 0; i < blocks.length; i++) {
+        var fields = blocks[i].DISPLAY_FIELDS || [blocks[i]];
+        for (var j = 0; j < fields.length; j++) {
+          if (fields[j].ID === 'newPassword' && fields[j].PAT_DESC) {
+            return fields[j].PAT_DESC;
+          }
+        }
+      }
+    } catch (e) {}
+    return fallback;
+  }
+
   function applyPasswordStepCopy() {
     $('#api h1').text('Add a new password to your account');
 
@@ -70,8 +94,27 @@ $(document).ready(function () {
     }
     $intro.html('<h2>Enter a password for your Opal account below</h2>').removeClass('none');
 
-    var $newPasswordLabel = $('#newPassword_label');
-    $newPasswordLabel.text($newPasswordLabel.text().replace(/^New password/, 'Create password'));
+    setPasswordLabel('#newPassword_label', 'Create password');
+    setPasswordLabel('#reenterPassword_label', 'Confirm password');
+
+    if (!$('.password-requirements').length) {
+      var $requirements = $('<div class="password-requirements"></div>')
+        .text(getPasswordRequirementsText())
+        .css({ 'font-size': '14px', color: '#5A6A72', margin: '4px 0 16px 0' });
+      var $newPasswordItem = $('#newPassword').closest('li');
+      if ($newPasswordItem.length) {
+        $requirements.insertAfter($newPasswordItem);
+      }
+    }
+
+    $('#cancel').hide();
+
+    var $continue = $('#continue');
+    if ($continue.is('input')) {
+      $continue.val('Continue to Opal');
+    } else {
+      $continue.text('Continue to Opal');
+    }
   }
 
   function waitForElement(selector) {
