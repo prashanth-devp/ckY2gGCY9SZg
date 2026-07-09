@@ -207,7 +207,12 @@ $(document).ready(function () {
   });
 
   $(document).on('click', '#emailVerificationControl_but_verify_code', async function () {
-    await waitForElement('#emailVerificationControl_success_message');
+    // Gate on the Continue button becoming enabled (aria-disabled='false'), which B2C only
+    // does after a successful server-side code verification. The success-message node exists and
+    // is visible from the "code sent" step onward (it is reused for both success_send_code_msg and
+    // success_verify_code_msg), so waiting on its presence advanced to the password step even when
+    // the OTP was empty/invalid.
+    await waitForButtonEnabled('continue');
 
     var rePassword = $('.reenterPassword_li');
     var newPassword = $('.newPassword_li');
@@ -308,3 +313,4 @@ $(document).ready(function () {
     }
   });
 });
+ 
