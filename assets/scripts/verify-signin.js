@@ -204,6 +204,7 @@ $(document).ready(function () {
     await waitForElementVisible('.verificationCode_li');
 
     $('#api').show();
+    $('#emailVerificationControl_success_message').hide();
     const introMessage = window?.SA_FIELDS.AttributeFields[0]?.DISPLAY_CONTROL_CONTENT?.intro_msg;
     if (introMessage) {
       $('#api h1').text(introMessage);
@@ -219,6 +220,7 @@ $(document).ready(function () {
   });
 
   $(document).on('click', '#emailVerificationControl_but_send_new_code', function () {
+    $('#emailVerificationControl_success_message').hide();
     startResendTimer();
   });
 
