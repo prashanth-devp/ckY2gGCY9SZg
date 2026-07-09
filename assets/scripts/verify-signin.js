@@ -1,5 +1,6 @@
 $(document).ready(function () {
   window.CONTENT.verifying_blurb = '';
+  var emailVerificationConfirmed = false;
 
   function preventApiHide() {
     var apiEl = document.getElementById('api');
@@ -225,17 +226,38 @@ $(document).ready(function () {
   });
 
   $(document).on('click', '#emailVerificationControl_but_verify_code', async function () {
-    await new Promise(function (resolve) {
-      var btn = document.getElementById('emailVerificationControl_but_verify_code');
-      if (btn && btn.style.display === 'none') {
-        resolve();
-        return;
-      }
+    var initialText = $('#emailVerificationControl_success_message').text().trim();
+
+    var verified = await new Promise(function (resolve) {
       var observer = new MutationObserver(function () {
         var btn = document.getElementById('emailVerificationControl_but_verify_code');
         if (btn && btn.style.display === 'none') {
           observer.disconnect();
-          resolve();
+          var settled = false;
+          var checkCount = 0;
+          var interval = setInterval(function () {
+            if (settled) return;
+            checkCount++;
+            var btn2 = document.getElementById('emailVerificationControl_but_verify_code');
+            if (btn2 && btn2.style.display !== 'none') {
+              settled = true;
+              clearInterval(interval);
+              resolve(false);
+              return;
+            }
+            var currentText = $('#emailVerificationControl_success_message').text().trim();
+            if (currentText.length > 0 && currentText !== initialText) {
+              settled = true;
+              clearInterval(interval);
+              resolve(true);
+              return;
+            }
+            if (checkCount >= 10) {
+              settled = true;
+              clearInterval(interval);
+              resolve(true);
+            }
+          }, 300);
         }
       });
       observer.observe(document.body, {
@@ -245,6 +267,10 @@ $(document).ready(function () {
         attributeFilter: ['style'],
       });
     });
+
+    if (!verified) return;
+
+    emailVerificationConfirmed = true;
 
     var rePassword = $('.reenterPassword_li');
     var newPassword = $('.newPassword_li');
@@ -278,8 +304,7 @@ $(document).ready(function () {
 
     if (rePassword.length && newPassword.length) {
       var emailControl = document.getElementById('emailVerificationControl');
-      var emailVerified = $('#emailVerificationControl_success_message').is(':visible');
-      if (emailControl && !emailVerified) {
+      if (emailControl && !emailVerificationConfirmed) {
         return;
       }
       $('#emailVerificationControl_success_message').hide();
@@ -347,4 +372,3 @@ $(document).ready(function () {
     }
   });
 });
- 
