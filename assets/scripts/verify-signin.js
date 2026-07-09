@@ -223,7 +223,7 @@ $(document).ready(function () {
   });
 
   $(document).on('click', '#emailVerificationControl_but_verify_code', async function () {
-    await waitForElement('#emailVerificationControl_success_message');
+    await waitForElementVisible('#emailVerificationControl_success_message');
 
     var rePassword = $('.reenterPassword_li');
     var newPassword = $('.newPassword_li');
