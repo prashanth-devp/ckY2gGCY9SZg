@@ -117,11 +117,9 @@ $(document).ready(function () {
 
   function handlePhoneVerificationSkip() {
     var $phone = $('#phone');
-    var phoneValue = $phone.val();
+    var phoneValue = ($phone.val() || '').trim();
 
     if (isEmailValue(phoneValue)) {
-      $phone.val('');
-      $phone.trigger('input').trigger('change');
       var phoneInput = $phone[0];
       if (phoneInput) {
         var nativeSetter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value').set;
@@ -129,6 +127,38 @@ $(document).ready(function () {
         phoneInput.dispatchEvent(new Event('input', { bubbles: true }));
         phoneInput.dispatchEvent(new Event('change', { bubbles: true }));
       }
+      phoneValue = '';
+    }
+
+    if (!phoneValue) {
+      var stored;
+      try { stored = sessionStorage.getItem('b2c_collected_phone'); } catch (e) {}
+      if (stored) {
+        try { sessionStorage.removeItem('b2c_collected_phone'); } catch (e) {}
+        var phoneInput = $phone[0];
+        if (phoneInput) {
+          var nativeSetter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value').set;
+          nativeSetter.call(phoneInput, stored);
+          phoneInput.dispatchEvent(new Event('input', { bubbles: true }));
+          phoneInput.dispatchEvent(new Event('change', { bubbles: true }));
+          phoneValue = stored;
+        }
+      }
+    }
+
+    if (phoneValue && !isEmailValue(phoneValue)) {
+      $('.phone_li').addClass('none');
+      $('.intro').addClass('none');
+      setTimeout(function () {
+        $('#phoneVerificationControl_but_send_code').click();
+      }, 300);
+      waitForButtonEnabled('continue').then(function (button) {
+        setTimeout(function () { button.click(); }, 0);
+        waitForElementVisible('#claimVerificationServerError').then(function () {
+          $('#api').show();
+        });
+      });
+      return;
     }
 
     $('.container').append('<div id="loading-indicator" style="text-align:center;padding:2rem;"><div class="spinner"></div></div>');
@@ -151,14 +181,16 @@ $(document).ready(function () {
   }
 
   waitForElement('#phoneVerificationControl_but_send_code').then(function () {
-    if (!document.getElementById('emailVerificationControl')) {
+    var emailControl = document.getElementById('emailVerificationControl');
+    var emailVisible = emailControl && $(emailControl).is(':visible');
+    if (!emailVisible) {
       handlePhoneVerificationSkip();
     }
   });
 
   var originalHeading = '';
 
-  $('#emailVerificationControl_but_send_code').on('click', async function () {
+  $(document).on('click', '#emailVerificationControl_but_send_code', async function () {
     await waitForElementVisible('.verificationCode_li');
 
     $('#api').show();
@@ -197,11 +229,11 @@ $(document).ready(function () {
     }
   });
 
-  $('#emailVerificationControl_but_send_new_code').on('click', function () {
+  $(document).on('click', '#emailVerificationControl_but_send_new_code', function () {
     startResendTimer();
   });
 
-  $('#emailVerificationControl_but_verify_code').on('click', async function () {
+  $(document).on('click', '#emailVerificationControl_but_verify_code', async function () {
     await waitForElement('#emailVerificationControl_success_message');
 
     var rePassword = $('.reenterPassword_li');
@@ -256,12 +288,11 @@ $(document).ready(function () {
     });
   });
 
-  // NOTE: verify-signin.js's auto-send block was intentionally REMOVED here for the email
+  // NOTE: verify-signin.js's auto-send block is intentionally REMOVED here for the email
   // link/change flow. That block auto-clicked "Send verification code" whenever #email was
-  // prefilled (it exists so sign-up, which carries the email from a prior step, sends on load).
-  // Because the email link/change screen prepopulates #email from emailHint, that auto-send made
-  // the page skip straight to code entry. Everything else is identical to verify-signin.js, so the
-  // user reviews/edits the prefilled email and clicks "Send verification code" themselves.
+  // prefilled — which, combined with the emailHint prepopulation, made the page skip straight to
+  // code entry. Everything else matches the current verify-signin.js so the code is still verified
+  // the same way; the user reviews/edits the prefilled email and clicks "Send verification code".
 
   waitForElement('#emailVerificationControl').then(function () {
     var sendCodeEl = document.getElementById('emailVerificationControl_but_send_code');
