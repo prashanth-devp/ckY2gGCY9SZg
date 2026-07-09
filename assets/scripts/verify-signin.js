@@ -62,21 +62,46 @@ $(document).ready(function () {
     $label.text(text + suffix);
   }
 
-  function getPasswordRequirementsText() {
-    var fallback =
-      'Your password must be 8+ characters long with uppercase characters, lowercase characters and numbers (0-9)';
-    try {
-      var blocks = (window.SA_FIELDS && window.SA_FIELDS.AttributeFields) || [];
-      for (var i = 0; i < blocks.length; i++) {
-        var fields = blocks[i].DISPLAY_FIELDS || [blocks[i]];
-        for (var j = 0; j < fields.length; j++) {
-          if (fields[j].ID === 'newPassword' && fields[j].PAT_DESC) {
-            return fields[j].PAT_DESC;
-          }
-        }
-      }
-    } catch (e) {}
-    return fallback;
+  function addEyeIconToPasswordFields() {
+    $('#api input[type="password"]').each(function () {
+      var $passwordInput = $(this);
+      if ($passwordInput.data('eyeAttached')) return;
+
+      var $wrapperItem = $passwordInput.closest('.entry-item, .attrEntry');
+      if (!$wrapperItem.length) return;
+
+      $wrapperItem.css('position', 'relative');
+      $passwordInput.css('paddingRight', '36px');
+
+      var $eyeIcon = $('<img>', {
+        src: 'https://opaleyes.com/adb2c/assets/images/eye-off.svg',
+        alt: 'Toggle visibility',
+      }).css({
+        position: 'absolute',
+        right: '10px',
+        bottom: '5px',
+        transform: 'translateY(-50%)',
+        cursor: 'pointer',
+        width: '20px',
+        height: '20px',
+        zIndex: '2',
+      });
+
+      var visible = false;
+      $eyeIcon.on('click', function () {
+        visible = !visible;
+        $passwordInput.attr('type', visible ? 'text' : 'password');
+        $eyeIcon.attr(
+          'src',
+          visible
+            ? 'https://opaleyes.com/adb2c/assets/images/eye.svg'
+            : 'https://opaleyes.com/adb2c/assets/images/eye-off.svg',
+        );
+      });
+
+      $wrapperItem.append($eyeIcon);
+      $passwordInput.data('eyeAttached', 'true');
+    });
   }
 
   function applyPasswordStepCopy() {
@@ -99,7 +124,7 @@ $(document).ready(function () {
 
     if (!$('.password-requirements').length) {
       var $requirements = $('<div class="password-requirements"></div>')
-        .text(getPasswordRequirementsText())
+        .text('Your password must be 8+ characters long with uppercase characters, lowercase characters and numbers (0-9)')
         .css({ 'font-size': '14px', color: '#5A6A72', margin: '4px 0 16px 0' });
       var $newPasswordItem = $('#newPassword').closest('li');
       if ($newPasswordItem.length) {
@@ -115,6 +140,8 @@ $(document).ready(function () {
     } else {
       $continue.text('Continue to Opal');
     }
+
+    addEyeIconToPasswordFields();
   }
 
   function waitForElement(selector) {
