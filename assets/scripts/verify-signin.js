@@ -225,8 +225,26 @@ $(document).ready(function () {
   });
 
   $(document).on('click', '#emailVerificationControl_but_verify_code', async function () {
-    $('#emailVerificationControl_success_message').hide();
-    await waitForElementVisible('#emailVerificationControl_success_message');
+    await new Promise(function (resolve) {
+      var btn = document.getElementById('emailVerificationControl_but_verify_code');
+      if (btn && btn.style.display === 'none') {
+        resolve();
+        return;
+      }
+      var observer = new MutationObserver(function () {
+        var btn = document.getElementById('emailVerificationControl_but_verify_code');
+        if (btn && btn.style.display === 'none') {
+          observer.disconnect();
+          resolve();
+        }
+      });
+      observer.observe(document.body, {
+        childList: true,
+        subtree: true,
+        attributes: true,
+        attributeFilter: ['style'],
+      });
+    });
 
     var rePassword = $('.reenterPassword_li');
     var newPassword = $('.newPassword_li');
