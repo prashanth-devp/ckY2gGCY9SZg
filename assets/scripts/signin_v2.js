@@ -424,6 +424,18 @@ function setupIdentifierFirst(elements) {
 
     revealPasswordStep();
   });
+
+  // Pressing Enter in the identifier field triggers implicit form submission, which
+  // clicks the native submit (#next) even while it's hidden — signing in with no
+  // password and skipping our email/phone routing. On the identifier step route Enter
+  // to the custom Continue instead. On the password step continueBtn is hidden, so we
+  // let the native Enter -> #next submission through (that's the real sign-in).
+  signInName.addEventListener('keydown', function (e) {
+    if (e.key !== 'Enter') return;
+    if (continueBtn.classList.contains('none')) return;
+    e.preventDefault();
+    continueBtn.click();
+  });
 }
 
 async function reorganizeLoginPage() {

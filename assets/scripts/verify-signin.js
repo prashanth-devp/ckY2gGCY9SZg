@@ -53,6 +53,7 @@ $(document).ready(function () {
     $('.email_li').addClass('none');
     $('.intro').addClass('none');
     startResendTimer();
+    watchForEmailVerified();
   }
 
   function setPasswordLabel(selector, text) {
@@ -142,6 +143,60 @@ $(document).ready(function () {
     }
 
     addEyeIconToPasswordFields();
+  }
+
+  function goToPasswordStep() {
+    var rePassword = $('.reenterPassword_li');
+    var newPassword = $('.newPassword_li');
+
+    if (!rePassword.length || !newPassword.length) return;
+    if (rePassword.is(':visible')) return;
+
+    emailVerificationConfirmed = true;
+
+    $('#emailVerificationControl_success_message').hide();
+    $('.emailVerificationCode_li').addClass('none');
+    $('#emailVerificationControl').addClass('none');
+    $('.email_li').addClass('none');
+    applyPasswordStepCopy();
+    rePassword.show();
+    newPassword.show();
+    $('#continue').show();
+    $('#attributeVerification > .buttons').css('display', 'flex');
+  }
+
+  // Detects verification success independent of how it was triggered. Pressing Enter in the
+  // code field verifies via B2C's own handler and never fires our jQuery click on the verify
+  // button, which previously stranded users on the "code verified, you can now continue" screen
+  // with the password step never shown. The "Change" button (change_claims) becomes visible only
+  // after the code is verified, so we advance on that signal for both click and Enter.
+  function watchForEmailVerified() {
+    if (watchForEmailVerified.started) return;
+    watchForEmailVerified.started = true;
+
+    function isVerified() {
+      var changeBtn = document.getElementById('emailVerificationControl_but_change_claims');
+      return changeBtn && $(changeBtn).is(':visible');
+    }
+
+    if (isVerified()) {
+      goToPasswordStep();
+      return;
+    }
+
+    var observer = new MutationObserver(function () {
+      if (isVerified()) {
+        observer.disconnect();
+        goToPasswordStep();
+      }
+    });
+
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true,
+      attributes: true,
+      attributeFilter: ['style', 'class', 'aria-hidden'],
+    });
   }
 
   function waitForElement(selector) {
@@ -314,67 +369,8 @@ $(document).ready(function () {
     startResendTimer();
   });
 
-  $(document).on('click', '#emailVerificationControl_but_verify_code', async function () {
-    var initialText = $('#emailVerificationControl_success_message').text().trim();
-
-    var verified = await new Promise(function (resolve) {
-      var observer = new MutationObserver(function () {
-        var btn = document.getElementById('emailVerificationControl_but_verify_code');
-        if (btn && btn.style.display === 'none') {
-          observer.disconnect();
-          var settled = false;
-          var checkCount = 0;
-          var interval = setInterval(function () {
-            if (settled) return;
-            checkCount++;
-            var btn2 = document.getElementById('emailVerificationControl_but_verify_code');
-            if (btn2 && btn2.style.display !== 'none') {
-              settled = true;
-              clearInterval(interval);
-              resolve(false);
-              return;
-            }
-            var currentText = $('#emailVerificationControl_success_message').text().trim();
-            if (currentText.length > 0 && currentText !== initialText) {
-              settled = true;
-              clearInterval(interval);
-              resolve(true);
-              return;
-            }
-            if (checkCount >= 10) {
-              settled = true;
-              clearInterval(interval);
-              resolve(true);
-            }
-          }, 300);
-        }
-      });
-      observer.observe(document.body, {
-        childList: true,
-        subtree: true,
-        attributes: true,
-        attributeFilter: ['style'],
-      });
-    });
-
-    if (!verified) return;
-
-    emailVerificationConfirmed = true;
-
-    var rePassword = $('.reenterPassword_li');
-    var newPassword = $('.newPassword_li');
-
-    if (rePassword.length && newPassword.length) {
-      $('#emailVerificationControl_success_message').hide();
-      $('.emailVerificationCode_li').addClass('none');
-      $('#emailVerificationControl').addClass('none');
-      $('.email_li').addClass('none');
-      applyPasswordStepCopy();
-      rePassword.show();
-      newPassword.show();
-      $('#continue').show();
-      $('#attributeVerification > .buttons').css('display', 'flex');
-    }
+  $(document).on('click', '#emailVerificationControl_but_verify_code', function () {
+    watchForEmailVerified();
   });
 
   waitForButtonEnabled('continue').then((button) => {
