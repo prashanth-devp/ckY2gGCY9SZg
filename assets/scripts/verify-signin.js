@@ -168,15 +168,27 @@ $(document).ready(function () {
   // Detects verification success independent of how it was triggered. Pressing Enter in the
   // code field verifies via B2C's own handler and never fires our jQuery click on the verify
   // button, which previously stranded users on the "code verified, you can now continue" screen
-  // with the password step never shown. The "Change" button (change_claims) becomes visible only
-  // after the code is verified, so we advance on that signal for both click and Enter.
+  // with the password step never shown. On the code-entry step B2C shows the "Verify code"
+  // button and hides it once the code is accepted (for both click and Enter), so we advance on
+  // that transition. We only treat "button hidden" as success after having seen it visible, so
+  // the initial send-code screen (where it is also hidden) doesn't false-trigger.
   function watchForEmailVerified() {
     if (watchForEmailVerified.started) return;
     watchForEmailVerified.started = true;
 
+    var sawVerifyButton = false;
+
+    function verifyButtonVisible() {
+      var btn = document.getElementById('emailVerificationControl_but_verify_code');
+      return !!btn && btn.style.display !== 'none' && $(btn).is(':visible');
+    }
+
     function isVerified() {
-      var changeBtn = document.getElementById('emailVerificationControl_but_change_claims');
-      return changeBtn && $(changeBtn).is(':visible');
+      if (verifyButtonVisible()) {
+        sawVerifyButton = true;
+        return false;
+      }
+      return sawVerifyButton;
     }
 
     if (isVerified()) {
