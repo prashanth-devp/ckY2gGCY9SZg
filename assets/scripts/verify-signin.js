@@ -75,7 +75,7 @@ $(document).ready(function () {
       $passwordInput.css('paddingRight', '36px');
 
       var $eyeIcon = $('<img>', {
-        src: 'https://prashanth-devp.github.io/ckY2gGCY9SZg/assets/images/eye-off.svg',
+        src: 'https://opaleyes.com/adb2c/assets/images/eye-off.svg',
         alt: 'Toggle visibility',
       }).css({
         position: 'absolute',
@@ -95,8 +95,8 @@ $(document).ready(function () {
         $eyeIcon.attr(
           'src',
           visible
-            ? 'https://prashanth-devp.github.io/ckY2gGCY9SZg/assets/images/eye.svg'
-            : 'https://prashanth-devp.github.io/ckY2gGCY9SZg/assets/images/eye-off.svg',
+            ? 'https://opaleyes.com/adb2c/assets/images/eye.svg'
+            : 'https://opaleyes.com/adb2c/assets/images/eye-off.svg',
         );
       });
 
@@ -165,41 +165,65 @@ $(document).ready(function () {
     $('#attributeVerification > .buttons').css('display', 'flex');
   }
 
-  // Detects verification success independent of how it was triggered. Pressing Enter in the
-  // code field verifies via B2C's own handler and never fires our jQuery click on the verify
-  // button, which previously stranded users on the "code verified, you can now continue" screen
-  // with the password step never shown. On the code-entry step B2C shows the "Verify code"
-  // button and hides it once the code is accepted (for both click and Enter), so we advance on
-  // that transition. We only treat "button hidden" as success after having seen it visible, so
-  // the initial send-code screen (where it is also hidden) doesn't false-trigger.
+  // Detects a *successful* verification independent of how it was triggered (click or Enter).
+  // Pressing Enter verifies via B2C's own handler and never fires our jQuery click on the verify
+  // button, which previously stranded users on the "code verified, you can now continue" screen.
+  // B2C briefly hides the "Verify code" button while it checks the code, then either:
+  //   - success: the button stays hidden and the success message switches to the "verified" copy, or
+  //   - error:   the button reappears and an error message is shown.
+  // So "button hidden" alone is NOT success (that wrongly advanced on a bad code); once the button
+  // hides we confirm the outcome before advancing, and re-arm on error so the next attempt counts.
   function watchForEmailVerified() {
     if (watchForEmailVerified.started) return;
     watchForEmailVerified.started = true;
 
+    var initialSuccessText = $('#emailVerificationControl_success_message').text().trim();
     var sawVerifyButton = false;
+    var confirming = false;
 
     function verifyButtonVisible() {
       var btn = document.getElementById('emailVerificationControl_but_verify_code');
       return !!btn && btn.style.display !== 'none' && $(btn).is(':visible');
     }
 
-    function isVerified() {
-      if (verifyButtonVisible()) {
-        sawVerifyButton = true;
-        return false;
-      }
-      return sawVerifyButton;
+    function errorVisible() {
+      var err = document.getElementById('emailVerificationControl_error_message');
+      return !!err && $(err).is(':visible') && err.textContent.trim().length > 0;
     }
 
-    if (isVerified()) {
-      goToPasswordStep();
-      return;
+    function confirmVerification() {
+      confirming = true;
+      var checkCount = 0;
+
+      var interval = setInterval(function () {
+        checkCount++;
+
+        // Error: the verify button came back or an error message appeared — re-arm.
+        if (verifyButtonVisible() || errorVisible()) {
+          clearInterval(interval);
+          confirming = false;
+          return;
+        }
+
+        // Success: the success message switched to the "verified" copy (or, as a last
+        // resort, the button has stayed hidden with no error for ~3s).
+        var currentText = $('#emailVerificationControl_success_message').text().trim();
+        if ((currentText.length > 0 && currentText !== initialSuccessText) || checkCount >= 10) {
+          clearInterval(interval);
+          observer.disconnect();
+          goToPasswordStep();
+        }
+      }, 300);
     }
 
     var observer = new MutationObserver(function () {
-      if (isVerified()) {
-        observer.disconnect();
-        goToPasswordStep();
+      if (verifyButtonVisible()) {
+        sawVerifyButton = true;
+        return;
+      }
+      // Button hidden after having been visible => a verify attempt is in flight; confirm it.
+      if (sawVerifyButton && !confirming) {
+        confirmVerification();
       }
     });
 
@@ -209,6 +233,10 @@ $(document).ready(function () {
       attributes: true,
       attributeFilter: ['style', 'class', 'aria-hidden'],
     });
+
+    if (verifyButtonVisible()) {
+      sawVerifyButton = true;
+    }
   }
 
   function waitForElement(selector) {
