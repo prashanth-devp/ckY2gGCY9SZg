@@ -46,4 +46,45 @@ $(document).ready(function () {
     e.preventDefault();
     navigateToSignUp();
   });
+
+  // On a duplicate-identity error ("account already exists" for email or phone, in sign-up
+  // or link/change), the server rejects the submit via #claimVerificationServerError.
+  // Re-clicking "Continue to Opal" (#continue) would just re-submit and re-error, so hide it
+  // while that error is shown and restore it once the error clears (e.g. the user edits the
+  // email/phone). Runs on every page but only acts on the duplicate-identity message, and
+  // never touches B2C's own disabled/aria-disabled state.
+  (function guardContinueOnDuplicateIdentity() {
+    var DUPLICATE_ERROR = /(already exists|specified id)/i;
+
+    function duplicateErrorShown() {
+      var $error = $("#claimVerificationServerError");
+      if (!$error.length || !$error.is(":visible")) return false;
+      return DUPLICATE_ERROR.test(($error.text() || "").trim());
+    }
+
+    function applyGuard() {
+      var continueButton = document.getElementById("continue");
+      if (!continueButton) return;
+
+      if (duplicateErrorShown()) {
+        if (continueButton.dataset.dupHidden !== "true") {
+          continueButton.dataset.dupHidden = "true";
+          continueButton.style.setProperty("display", "none", "important");
+        }
+      } else if (continueButton.dataset.dupHidden === "true") {
+        delete continueButton.dataset.dupHidden;
+        continueButton.style.removeProperty("display");
+      }
+    }
+
+    var observer = new MutationObserver(applyGuard);
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true,
+      attributes: true,
+      attributeFilter: ["style", "class", "aria-hidden"],
+    });
+
+    applyGuard();
+  })();
 });

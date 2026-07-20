@@ -215,6 +215,14 @@
       display: none !important;
     }
 
+    /* Hide B2C's built-in SelfAsserted cancel button (rendered as "Back"). It is
+       revealed alongside "Continue to Opal" when verify-phone-code.js shows the
+       button row after OTP verification, and clicking it submits the SelfAsserted
+       cancel (AADB2C90091 full-page error). It is unused on this page. */
+    #api #cancel {
+      display: none !important;
+    }
+
     #api form#attributeVerification > .buttons {
       display: none;
       flex-direction: row-reverse;
