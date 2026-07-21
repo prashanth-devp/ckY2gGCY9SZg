@@ -1,3 +1,14 @@
+function hideNativePasswordReveal() {
+  if (document.getElementById('hide-native-password-reveal')) return;
+
+  const style = document.createElement('style');
+  style.id = 'hide-native-password-reveal';
+  style.textContent =
+    'input[type="password"]::-ms-reveal,' +
+    'input[type="password"]::-ms-clear { display: none; }';
+  document.head.appendChild(style);
+}
+
 function addEyeIconIntoPasswordField() {
   $('input[type="password"]').each(function () {
     const $passwordInput = $(this);
@@ -68,6 +79,7 @@ function waitForElementVisible(selector) {
 }
 
 $(document).ready(async function () {
+  hideNativePasswordReveal();
   await waitForElementVisible('input[type="password"]');
   addEyeIconIntoPasswordField();
 });
