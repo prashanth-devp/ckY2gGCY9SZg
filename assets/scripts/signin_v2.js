@@ -101,6 +101,10 @@ function waitForElements() {
         forgotPassword: document.getElementById('ForgotPasswordExchange'),
         // US-1.3: PhoneSignInExchange routes to Sub.PhoneSignIn (phone-only primary auth).
         passwordlessExchange: document.getElementById('PhoneSignInExchange'),
+        // "Send one time code": email OTP option (PasswordlessExchange) shown on the password
+        // step for users who don't know their password. Captured here before reorganizeOptions
+        // clears the options list, otherwise innerHTML='' would destroy it.
+        emailOtpExchange: document.getElementById('PasswordlessExchange'),
         createAccount: document.getElementById('SignUpExchange'),
         form: document.getElementById('localAccountForm'),
         isLoginPage: document.querySelector('#api.signIn'),
@@ -194,7 +198,7 @@ function moveSocialSection(form, socialSection) {
   form.parentNode.insertBefore(socialSection, form.nextSibling);
 }
 
-function reorganizeOptions(socialSection, createAccount, forgotPassword, passwordlessExchange) {
+function reorganizeOptions(socialSection, createAccount, forgotPassword, passwordlessExchange, emailOtpExchange) {
   const options = socialSection.querySelector('.options');
   if (!options) return;
 
@@ -215,6 +219,19 @@ function reorganizeOptions(socialSection, createAccount, forgotPassword, passwor
     const passwordlessContainer = document.createElement('div');
     passwordlessContainer.appendChild(passwordlessExchange);
     options.appendChild(passwordlessContainer);
+  }
+
+  // Re-attach the email one-time-code option destroyed by the innerHTML reset above.
+  // Hidden on the identifier step; revealPasswordStep() shows it on the password step
+  // so a user who doesn't know their password can request a code instead.
+  if (emailOtpExchange) {
+    emailOtpExchange.textContent = 'Send one time code';
+    emailOtpExchange.classList.add('link');
+    const emailOtpContainer = document.createElement('div');
+    emailOtpContainer.id = 'emailOtpOption';
+    emailOtpContainer.classList.add('none');
+    emailOtpContainer.appendChild(emailOtpExchange);
+    options.appendChild(emailOtpContainer);
   }
 
   options.appendChild(forgotContainer);
@@ -289,6 +306,24 @@ function setupIdentifierFirst(elements) {
     });
   }
 
+  // "Send one time code" (email OTP) — only meaningful once we ask for a password, so it
+  // stays hidden on the identifier step and is revealed with the password field. Stash the
+  // typed email so the OTP screen prefills it (same key verify-signin.js consumes).
+  const emailOtpExchange = elements.emailOtpExchange;
+  function setEmailOtpHidden(hidden) {
+    const container = document.getElementById('emailOtpOption');
+    const target = container || emailOtpExchange;
+    if (target) target.classList[hidden ? 'add' : 'remove']('none');
+  }
+  if (emailOtpExchange) {
+    emailOtpExchange.addEventListener('click', function () {
+      const value = signInName.value.trim();
+      if (isValidEmail(value)) {
+        try { sessionStorage.setItem('b2c_collected_email', value); } catch (e) {}
+      }
+    });
+  }
+
   // Prefer the dedicated .entry-item wrapper; never fall back to a parent that
   // could be the whole form (that would hide the identifier field too).
   const passwordItem = password.closest('.entry-item');
@@ -336,6 +371,7 @@ function setupIdentifierFirst(elements) {
   function revealPasswordStep() {
     setPasswordHidden(false);
     setForgotHidden(false);
+    setEmailOtpHidden(false);
     next.classList.remove('none');
     if (continueBtn) continueBtn.classList.add('none');
     if (phoneExchange) phoneExchange.classList.add('none');
@@ -374,6 +410,7 @@ function setupIdentifierFirst(elements) {
     // password" option (phone is auto-routed on Continue).
     setPasswordHidden(true);
     setForgotHidden(true);
+    setEmailOtpHidden(true);
     next.classList.add('none');
     if (phoneExchange) phoneExchange.classList.add('none');
   }
@@ -450,6 +487,7 @@ async function reorganizeLoginPage() {
       elements.createAccount,
       elements.forgotPassword,
       elements.passwordlessExchange,
+      elements.emailOtpExchange,
     );
     removeSocialIntro(elements.socialSection);
     setupNextButtonHandler();
