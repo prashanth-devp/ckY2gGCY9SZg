@@ -225,11 +225,16 @@ function reorganizeOptions(socialSection, createAccount, forgotPassword, passwor
   // Hidden on the identifier step; revealPasswordStep() shows it on the password step
   // so a user who doesn't know their password can request a code instead.
   if (emailOtpExchange) {
-    emailOtpExchange.textContent = 'Send one time code';
-    emailOtpExchange.classList.add('link');
+    emailOtpExchange.textContent = 'Login with one time password';
+    emailOtpExchange.classList.remove('link');
+    emailOtpExchange.style.cssText =
+      'display:block;width:100%;box-sizing:border-box;text-align:center;text-decoration:none;' +
+      'padding:14px 16px;border:1px solid #2F7D92;border-radius:8px;background:#fff;color:#2F7D92;' +
+      'font-weight:600;cursor:pointer;';
     const emailOtpContainer = document.createElement('div');
     emailOtpContainer.id = 'emailOtpOption';
     emailOtpContainer.classList.add('none');
+    emailOtpContainer.style.marginTop = '12px';
     emailOtpContainer.appendChild(emailOtpExchange);
     options.appendChild(emailOtpContainer);
   }
@@ -306,9 +311,9 @@ function setupIdentifierFirst(elements) {
     });
   }
 
-  // "Send one time code" (email OTP) — only meaningful once we ask for a password, so it
-  // stays hidden on the identifier step and is revealed with the password field. Stash the
-  // typed email so the OTP screen prefills it (same key verify-signin.js consumes).
+  // "Login with one time password" (email OTP) — shown on the identifier step as an
+  // alternative to entering a password; hidden once the user commits to the password step.
+  // Stash the typed email so the OTP screen prefills it (same key verify-signin.js consumes).
   const emailOtpExchange = elements.emailOtpExchange;
   function setEmailOtpHidden(hidden) {
     const container = document.getElementById('emailOtpOption');
@@ -371,7 +376,7 @@ function setupIdentifierFirst(elements) {
   function revealPasswordStep() {
     setPasswordHidden(false);
     setForgotHidden(false);
-    setEmailOtpHidden(false);
+    setEmailOtpHidden(true);
     next.classList.remove('none');
     if (continueBtn) continueBtn.classList.add('none');
     if (phoneExchange) phoneExchange.classList.add('none');
@@ -410,7 +415,7 @@ function setupIdentifierFirst(elements) {
     // password" option (phone is auto-routed on Continue).
     setPasswordHidden(true);
     setForgotHidden(true);
-    setEmailOtpHidden(true);
+    setEmailOtpHidden(false);
     next.classList.add('none');
     if (phoneExchange) phoneExchange.classList.add('none');
   }
