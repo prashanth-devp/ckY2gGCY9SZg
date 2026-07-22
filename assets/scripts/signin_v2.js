@@ -229,7 +229,7 @@ function reorganizeOptions(socialSection, createAccount, forgotPassword, passwor
     emailOtpExchange.classList.remove('link');
     emailOtpExchange.style.cssText =
       'display:block;width:100%;box-sizing:border-box;text-align:center;text-decoration:none;' +
-      'padding:14px 16px;border:1px solid #2F7D92;border-radius:8px;background:#fff;color:#2F7D92;' +
+      'padding:14px 16px;border:1px solid #2F7D92;border-radius:0;background:#fff;color:#2F7D92;' +
       'font-weight:600;cursor:pointer;';
     const emailOtpContainer = document.createElement('div');
     emailOtpContainer.id = 'emailOtpOption';
