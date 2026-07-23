@@ -56,6 +56,37 @@ $(document).ready(function () {
         });
     }
 
+    var resendTimerInterval = null;
+
+    function startResendTimer() {
+        if (resendTimerInterval) {
+            clearInterval(resendTimerInterval);
+        }
+
+        var $btn = $('#emailVerificationControl_but_send_new_code');
+        if (!$btn.length) {
+            return;
+        }
+
+        var label = $btn.text().replace(/\s*\(\d+s\)$/, '').trim() || 'Resend code';
+        var remaining = 60;
+
+        $btn.text(label + ' (' + remaining + 's)');
+        $btn.css({ 'pointer-events': 'none', opacity: '0.6' });
+
+        resendTimerInterval = setInterval(function () {
+            remaining--;
+            if (remaining <= 0) {
+                clearInterval(resendTimerInterval);
+                resendTimerInterval = null;
+                $btn.text(label);
+                $btn.css({ 'pointer-events': '', opacity: '' });
+            } else {
+                $btn.text(label + ' (' + remaining + 's)');
+            }
+        }, 1000);
+    }
+
     $('#emailVerificationControl_but_send_code').on('click', async function () {
         await waitForElementVisible('.verificationCode_li');
 
@@ -66,6 +97,11 @@ $(document).ready(function () {
 
         $('.email_li').addClass('none');
         $('.intro').addClass('none');
+        startResendTimer();
+    });
+
+    $(document).on('click', '#emailVerificationControl_but_send_new_code', function () {
+        startResendTimer();
     });
 
     // Pre-fill the email carried over from the sign-in screen (signin_v2.js
