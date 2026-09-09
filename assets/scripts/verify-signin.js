@@ -17,42 +17,223 @@ $(document).ready(function () {
 
   preventApiHide();
 
-  var resendTimerInterval = null;
+  var RESEND_COOLDOWN_MS = 60 * 1000;
+  var RESEND_COOLDOWN_KEY = 'b2c_otp_resend_until';
+  var resendCountdownInterval = null;
 
-  function startResendTimer() {
-    if (resendTimerInterval) clearInterval(resendTimerInterval);
-
-    var $btn = $('#emailVerificationControl_but_send_new_code');
-    var label =
-      $btn
-        .text()
-        .replace(/\s*\(\d+s\)$/, '')
-        .trim() || 'Resend code';
-    var remaining = 60;
-
-    $btn.text(label + ' (' + remaining + 's)');
-    $btn.css({ 'pointer-events': 'none', opacity: '0.6' });
-
-    resendTimerInterval = setInterval(function () {
-      remaining--;
-      if (remaining <= 0) {
-        clearInterval(resendTimerInterval);
-        resendTimerInterval = null;
-        $btn.text(label);
-        $btn.css({ 'pointer-events': '', opacity: '' });
-      } else {
-        $btn.text(label + ' (' + remaining + 's)');
-      }
-    }, 1000);
+  function otpControl(suffix) {
+    return $('[id^="emailVerificationControl"][id$="' + suffix + '"]');
   }
 
+  function trackResend(outcome) {
+    window.dataLayer = window.dataLayer || [];
+    window.dataLayer.push(['event', 'otp_resend', { feature_id: 'otp1_resend_cooldown', outcome: outcome }]);
+  }
+
+  function announceResendStatus(message) {
+    var $live = $('#otp-resend-status');
+    if (!$live.length) {
+      $live = $(
+        '<div id="otp-resend-status" role="status" ' +
+          'style="position:absolute;width:1px;height:1px;overflow:hidden;"></div>',
+      );
+      $(document.body).append($live);
+    }
+    $live.text(message);
+  }
+
+  function waitForSendOutcome() {
+    var initialSuccessText = otpControl('_success_message').text().trim();
+    return new Promise(function (resolve) {
+      var settled = false;
+      function done(outcome) {
+        if (settled) return;
+        settled = true;
+        clearTimeout(timeout);
+        observer.disconnect();
+        resolve(outcome);
+      }
+      function check() {
+        var $error = otpControl('_error_message');
+        if ($error.length && $error.is(':visible') && $error.text().trim().length > 0) {
+          done('failed');
+          return;
+        }
+        var $success = otpControl('_success_message');
+        var currentText = $success.text().trim();
+        if ($success.length && $success.is(':visible') && currentText !== initialSuccessText) {
+          done('accepted');
+        }
+      }
+      var observer = new MutationObserver(check);
+      observer.observe(document.body, {
+        childList: true,
+        subtree: true,
+        attributes: true,
+        attributeFilter: ['style', 'class'],
+      });
+      var timeout = setTimeout(function () {
+        done('failed');
+      }, 10000);
+    });
+  }
+
+  function showSendConfirmation(sentAt) {
+    var timeText = sentAt.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
+    $('#otp-sent-at').remove();
+    otpControl('_success_message')
+      .show()
+      .after('<p id="otp-sent-at">✓ Code sent at ' + timeText + '</p>');
+  }
+
+  function updateCountdownText(secondsLeft) {
+    var $countdown = $('#otp-resend-countdown');
+    var text = 'You can request a new code in ' + secondsLeft + 's';
+    if (!$countdown.length) {
+      otpControl('_but_send_new_code').after('<p id="otp-resend-countdown" aria-hidden="true">' + text + '</p>');
+    } else {
+      $countdown.text(text);
+    }
+  }
+
+  function applyResendCooldownUi(active) {
+    var $btn = otpControl('_but_send_new_code');
+    if (active) {
+      $btn.text('Resend code');
+      $btn.prop('disabled', true);
+      $btn.attr('aria-disabled', 'true');
+      $btn.attr('aria-label', 'Resend code, available in about a minute');
+    } else {
+      $btn.prop('disabled', false);
+      $btn.removeAttr('aria-disabled');
+      $btn.removeAttr('aria-label');
+      $('#otp-resend-countdown').remove();
+    }
+  }
+
+  function runCooldownTicker(cooldownUntil) {
+    if (resendCountdownInterval) clearInterval(resendCountdownInterval);
+    function tick() {
+      var remaining = Math.ceil((cooldownUntil - Date.now()) / 1000);
+      if (remaining <= 0) {
+        clearInterval(resendCountdownInterval);
+        resendCountdownInterval = null;
+        try {
+          sessionStorage.removeItem(RESEND_COOLDOWN_KEY);
+        } catch (e) {}
+        applyResendCooldownUi(false);
+        announceResendStatus('You can request a new code now.');
+        return;
+      }
+      updateCountdownText(remaining);
+    }
+    tick();
+    resendCountdownInterval = setInterval(tick, 1000);
+  }
+
+  function startResendCooldown(sentAt) {
+    var cooldownUntil = Date.now() + RESEND_COOLDOWN_MS;
+    try {
+      sessionStorage.setItem(RESEND_COOLDOWN_KEY, String(cooldownUntil));
+    } catch (e) {}
+    applyResendCooldownUi(true);
+    announceResendStatus(
+      'Code sent at ' +
+        sentAt.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false }) +
+        '. You can request a new code in 60 seconds.',
+    );
+    runCooldownTicker(cooldownUntil);
+  }
+
+  function resumeResendCooldownIfActive() {
+    var stored;
+    try {
+      stored = sessionStorage.getItem(RESEND_COOLDOWN_KEY);
+    } catch (e) {}
+    if (!stored) return;
+    var cooldownUntil = parseInt(stored, 10);
+    if (!cooldownUntil || cooldownUntil <= Date.now()) {
+      try {
+        sessionStorage.removeItem(RESEND_COOLDOWN_KEY);
+      } catch (e) {}
+      return;
+    }
+    applyResendCooldownUi(true);
+    runCooldownTicker(cooldownUntil);
+  }
+
+  function guardResendDuringCooldown(e) {
+    var stored;
+    try {
+      stored = sessionStorage.getItem(RESEND_COOLDOWN_KEY);
+    } catch (e2) {
+      stored = null;
+    }
+    if (stored && parseInt(stored, 10) > Date.now()) {
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      trackResend('blocked_cooldown');
+    }
+  }
+
+  var resendGuardAttachedTo = null;
+  function attachResendGuard() {
+    var btn = otpControl('_but_send_new_code')[0];
+    if (!btn || btn === resendGuardAttachedTo) return;
+    resendGuardAttachedTo = btn;
+    btn.addEventListener('click', guardResendDuringCooldown, true);
+    btn.addEventListener(
+      'keydown',
+      function (e) {
+        if (e.key === 'Enter' || e.key === ' ') guardResendDuringCooldown(e);
+      },
+      true,
+    );
+  }
+
+  function armSendOutcomeHandling(sendTriggeredAt) {
+    waitForSendOutcome().then(function (outcome) {
+      if (outcome === 'accepted') {
+        showSendConfirmation(sendTriggeredAt);
+        startResendCooldown(sendTriggeredAt);
+        trackResend('accepted');
+      } else {
+        trackResend('send_failed');
+      }
+    });
+  }
+
+  var OTP_GUIDANCE_HTML =
+    '<div id="otp-guidance" role="note">' +
+    '<p>Not seeing it? Check spam or junk. It can take a few minutes, ' +
+    'and only one code is sent at a time.</p>' +
+    '</div>';
+
+  function showOtpGuidance() {
+    var flow = document.body.dataset.flow;
+    if (['signin', 'signup', 'passwordless'].indexOf(flow) === -1) return;
+
+    $('#emailVerificationControl_success_message').attr('role', 'status');
+
+    if (!$('#otp-guidance').length) {
+      $('.verificationCode_li').after(OTP_GUIDANCE_HTML);
+    }
+
+    if (!showOtpGuidance.fired) {
+      showOtpGuidance.fired = true;
+      window.dataLayer = window.dataLayer || [];
+      window.dataLayer.push(['event', 'otp_guidance_shown', { feature_id: 'otp1_wait_guidance', flow: flow }]);
+    }
+  }
   function showVerificationCodeStep() {
     $('#api').show();
     $('#api h1').text('Enter verification code');
     $('#emailVerificationControl_success_message').show();
     $('.email_li').addClass('none');
     $('.intro').addClass('none');
-    startResendTimer();
+    showOtpGuidance(); // US 1.2 — already planned separately
+    attachResendGuard();
+    resumeResendCooldownIfActive();
     watchForEmailVerified();
   }
 
@@ -125,7 +306,9 @@ $(document).ready(function () {
 
     if (!$('.password-requirements').length) {
       var $requirements = $('<div class="password-requirements"></div>')
-        .text('Your password must be 8+ characters long with uppercase characters, lowercase characters and numbers (0-9)')
+        .text(
+          'Your password must be 8+ characters long with uppercase characters, lowercase characters and numbers (0-9)',
+        )
         .css({ 'font-size': '14px', color: '#5A6A72', margin: '4px 0 16px 0' });
       var $newPasswordItem = $('#newPassword').closest('li');
       if ($newPasswordItem.length) {
@@ -165,14 +348,6 @@ $(document).ready(function () {
     $('#attributeVerification > .buttons').css('display', 'flex');
   }
 
-  // Detects a *successful* verification independent of how it was triggered (click or Enter).
-  // Pressing Enter verifies via B2C's own handler and never fires our jQuery click on the verify
-  // button, which previously stranded users on the "code verified, you can now continue" screen.
-  // B2C briefly hides the "Verify code" button while it checks the code, then either:
-  //   - success: the button stays hidden and the success message switches to the "verified" copy, or
-  //   - error:   the button reappears and an error message is shown.
-  // So "button hidden" alone is NOT success (that wrongly advanced on a bad code); once the button
-  // hides we confirm the outcome before advancing, and re-arm on error so the next attempt counts.
   function watchForEmailVerified() {
     if (watchForEmailVerified.started) return;
     watchForEmailVerified.started = true;
@@ -205,8 +380,6 @@ $(document).ready(function () {
           return;
         }
 
-        // Success: the success message switched to the "verified" copy (or, as a last
-        // resort, the button has stayed hidden with no error for ~3s).
         var currentText = $('#emailVerificationControl_success_message').text().trim();
         if ((currentText.length > 0 && currentText !== initialSuccessText) || checkCount >= 10) {
           clearInterval(interval);
@@ -221,7 +394,7 @@ $(document).ready(function () {
         sawVerifyButton = true;
         return;
       }
-      // Button hidden after having been visible => a verify attempt is in flight; confirm it.
+
       if (sawVerifyButton && !confirming) {
         confirmVerification();
       }
@@ -399,14 +572,17 @@ $(document).ready(function () {
 
     showVerificationCodeStep();
 
+    // Every OTP send — including the automatic first send — gets the same
+    // confirmation + cooldown treatment as resend.
+    armSendOutcomeHandling(new Date());
+
     if ($('.reenterPassword_li').length && $('.newPassword_li').length) {
       $('#continue').hide();
     }
   });
 
-  $(document).on('click', '#emailVerificationControl_but_send_new_code', function () {
-    $('#emailVerificationControl_success_message').show();
-    startResendTimer();
+  $(document).on('click', '[id^="emailVerificationControl"][id$="_but_send_new_code"]', function () {
+    armSendOutcomeHandling(new Date());
   });
 
   $(document).on('click', '#emailVerificationControl_but_verify_code', function () {
