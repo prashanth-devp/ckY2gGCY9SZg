@@ -256,42 +256,49 @@
     #api .buttons {
       display: flex;
       flex-direction: column;
-      align-items: stretch;
+      align-items: center;
       gap: 10px;
     }
 
-    /* Tertiary/Small button (Figma "Resend code"): full-width white bg, teal bold text, 40px tall.
-       Overrides the primary #api button styles above. */
     #api .sendNewCode {
-      width: 100%;
-      /* self-stretch */
-      min-width: 9rem;
-      /* min-w-36 */
-      height: 2.5rem;
-      /* h-10 */
-      min-height: 2.5rem;
-      /* min-h-10 */
-      max-height: 2.5rem;
-      /* max-h-10 */
-      padding: 0.5rem 0;
-      /* py-2 */
-      background: white;
-      /* bg-white */
+      width: auto;
+      min-width: 0;
+      height: auto;
+      min-height: 0;
+      max-height: none;
+      padding: 4px 0;
+      background: transparent;
       color: rgb(47 125 146 / var(--tw-bg-opacity, 1));
-      /* text-Content-Tertiary-Default */
       font-size: 1rem;
-      /* text-base */
       font-weight: 700;
-      /* font-bold */
       line-height: 1.5rem;
-      /* leading-6 */
       border: none;
+      cursor: pointer;
+    }
+
+    #api .sendNewCode:disabled {
+      color: #9CA3AF;
+      cursor: not-allowed;
     }
 
     #otp-guidance {
       color: #6b7280;
       font-size: 0.875rem;
       margin: 8px 0 16px;
+    }
+
+    #otp-resend-countdown {
+      color: #6b7280;
+      font-size: 0.8rem;
+      margin: 4px 0 0;
+      text-align: center;
+    }
+
+    #otp-sent-at {
+      color: #15803d;
+      font-weight: 600;
+      margin: 8px 0 4px;
+      text-align: center;
     }
   </style>
 </head>

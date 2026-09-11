@@ -299,9 +299,8 @@ $(document).ready(function () {
   function showSendConfirmation(sentAt) {
     var timeText = sentAt.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
     $('#otp-sent-at').remove();
-    otpControl('_success_message')
-      .show()
-      .after('<p id="otp-sent-at">✓ Code sent at ' + timeText + '</p>');
+    otpControl('_success_message').show();
+    otpControl('_but_send_new_code').before('<p id="otp-sent-at">✓ Code sent at ' + timeText + '</p>');
   }
 
   function updateCountdownText(secondsLeft) {
@@ -440,7 +439,7 @@ $(document).ready(function () {
   var OTP_GUIDANCE_HTML =
     '<div id="otp-guidance" role="note">' +
     '<p>Not seeing it? Check spam or junk. It can take a few minutes, ' +
-    'and only one code is sent at a time.</p>' +
+    'and please only request one code at a time.</p>' +
     '</div>';
 
   function showOtpGuidance() {

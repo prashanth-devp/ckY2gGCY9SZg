@@ -103,9 +103,20 @@ $(document).ready(function () {
       });
     }
 
+    function isolatedDigitRuns(text) {
+      var segments = text.match(/\d+|\D+/g) || [];
+      return segments.filter(function (segment) {
+        return /^\d+$/.test(segment);
+      });
+    }
+
     function sanitizeOtpValue(input) {
       var raw = input.value;
-      var cleaned = raw.replace(/[\s\u00A0\u200B-\u200D\uFEFF]/g, '').replace(/\D/g, '');
+      var withoutInvisible = raw.replace(/[\u00A0\u200B-\u200D\uFEFF]/g, '');
+      var sixDigitRuns = isolatedDigitRuns(withoutInvisible).filter(function (run) {
+        return run.length === 6;
+      });
+      var cleaned = sixDigitRuns.length === 1 ? sixDigitRuns[0] : withoutInvisible;
       if (cleaned === raw) return;
       var nativeSetter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value').set;
       nativeSetter.call(input, cleaned);
@@ -122,9 +133,43 @@ $(document).ready(function () {
       ]);
     }
 
+    // Figma shows a visibility (eye) icon inside the code field. Purely decorative for now - no
+    // masking/toggle behaviour wired up, so it doesn't affect the input's value, autocomplete, or
+    // autofill. aria-hidden + pointer-events:none keep it out of the way of screen readers and
+    // clicks, which just pass through to the input underneath.
+    function addEyeIconToCodeInput($input) {
+      var input = $input[0];
+      if (!input || input.dataset.otpEyeIconAdded) return;
+      input.dataset.otpEyeIconAdded = 'true';
+
+      // Wrap just the input, not the whole field group (label + error text sit above it in the
+      // same .attrEntry) - otherwise centering the icon at 50% height centers it against that
+      // taller block instead of the input box itself.
+      $input.wrap('<span class="otp-code-input-wrap" style="position:relative;display:block;"></span>');
+      $input.css('paddingRight', '36px');
+
+      var eyeIconSvg =
+        '<svg width="15" height="12" viewBox="0 0 15 12" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">' +
+        '<path d="M7.21244 0C10.8072 0 13.7978 2.58651 14.4248 6C13.7978 9.41347 10.8072 12 7.21244 12C3.61765 12 0.627007 9.41347 0 6C0.627007 2.58651 3.61765 0 7.21244 0ZM7.21244 10.6667C10.0362 10.6667 12.4524 8.70133 13.064 6C12.4524 3.29869 10.0362 1.33333 7.21244 1.33333C4.38864 1.33333 1.97239 3.29869 1.36076 6C1.97239 8.70133 4.38864 10.6667 7.21244 10.6667ZM7.21244 9C5.55556 9 4.21241 7.65687 4.21241 6C4.21241 4.34315 5.55556 3 7.21244 3C8.86924 3 10.2124 4.34315 10.2124 6C10.2124 7.65687 8.86924 9 7.21244 9ZM7.21244 7.66667C8.13291 7.66667 8.87911 6.92047 8.87911 6C8.87911 5.07953 8.13291 4.33333 7.21244 4.33333C6.29197 4.33333 5.54575 5.07953 5.54575 6C5.54575 6.92047 6.29197 7.66667 7.21244 7.66667Z" fill="#1A1A1A"/>' +
+        '</svg>';
+
+      $(eyeIconSvg)
+        .css({
+          position: 'absolute',
+          right: '12px',
+          top: '50%',
+          transform: 'translateY(-50%)',
+          pointerEvents: 'none',
+        })
+        .insertAfter($input);
+    }
+
     function applyHardening() {
       var $codeInput = $('.verificationCode_li input');
-      if ($codeInput.length) hardenOtpInput($codeInput);
+      if ($codeInput.length) {
+        hardenOtpInput($codeInput);
+        addEyeIconToCodeInput($codeInput);
+      }
     }
 
     var observer = new MutationObserver(applyHardening);
