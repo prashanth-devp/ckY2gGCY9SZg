@@ -113,10 +113,29 @@ $(document).ready(function () {
     function sanitizeOtpValue(input) {
       var raw = input.value;
       var withoutInvisible = raw.replace(/[\u00A0\u200B-\u200D\uFEFF]/g, '');
-      var sixDigitRuns = isolatedDigitRuns(withoutInvisible).filter(function (run) {
-        return run.length === 6;
-      });
-      var cleaned = sixDigitRuns.length === 1 ? sixDigitRuns[0] : withoutInvisible;
+      var runs = isolatedDigitRuns(withoutInvisible);
+      var cleaned;
+
+      if (runs.length === 1) {
+        cleaned = runs[0].slice(0, 6);
+      } else {
+        var sixDigitRuns = runs.filter(function (run) {
+          return run.length === 6;
+        });
+        // Repeats of the same code (e.g. "186118 186118") are not ambiguous - only distinct
+        // values are. Dedupe before deciding whether there is exactly one candidate.
+        var distinctSixDigitRuns = sixDigitRuns.filter(function (run, index) {
+          return sixDigitRuns.indexOf(run) === index;
+        });
+        if (distinctSixDigitRuns.length === 1) {
+          cleaned = distinctSixDigitRuns[0];
+        } else {
+          // Genuinely ambiguous - two or more different-looking numbers, no single clear
+          // candidate. Still never allow more than six digits in the field either way.
+          cleaned = withoutInvisible.replace(/\D/g, '').slice(0, 6);
+        }
+      }
+
       if (cleaned === raw) return;
       var nativeSetter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value').set;
       nativeSetter.call(input, cleaned);
