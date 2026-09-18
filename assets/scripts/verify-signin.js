@@ -3,15 +3,20 @@ $(document).ready(function () {
   var emailVerificationConfirmed = false;
 
   // A B2C display control id prefixes every DOM id that control renders. The login journeys
-  // (UX-VerifyMFAEmail.SignIn / .Passwordless) render emailVerificationControlCustomOtp, whose
-  // SendCode/VerifyCode actions call the Opal verification service (REST-SendEmailOTP /
-  // REST-ValidateEmailOTP) so the code is sent from a Bausch + Lomb address; SignUp,
-  // ForgotPassword and MFASetup still render emailVerificationControl (AadSspr). Match whichever
-  // is on the page rather than hardcoding one, so reverting a journey back to
-  // UX-VerifyMFAEmail.Base needs no page change.
+  // (UX-VerifyMFAEmail.SignIn / .Passwordless) render emailVerificationControlCustomOtp; SignUp,
+  // ForgotPassword, MFASetup and Email Link/Change render emailVerificationControlOpalOtp. Both
+  // controls' SendCode/VerifyCode actions call the Opal verification service (REST-SendEmailOTP /
+  // REST-ValidateEmailOTP) so the code is sent from a Bausch + Lomb address. The bare
+  // emailVerificationControl is the AadSspr (Microsoft) one, kept only so a journey can be put
+  // back on it. Match whichever is on the page rather than hardcoding one, so repointing a
+  // journey needs no page change.
+  //
+  // OpalOtp was missing here after SignUp moved onto it, which left EMAIL.sendCode and
+  // EMAIL.control matching nothing on the signup verify page: no auto-send fired and the email
+  // field was never hidden, so the page looked like it was asking for the email a second time.
   function sel(kind, suffix) {
     var base = kind + 'VerificationControl';
-    return '#' + base + suffix + ', #' + base + 'CustomOtp' + suffix;
+    return '#' + base + suffix + ', #' + base + 'CustomOtp' + suffix + ', #' + base + 'OpalOtp' + suffix;
   }
 
   var EMAIL = {

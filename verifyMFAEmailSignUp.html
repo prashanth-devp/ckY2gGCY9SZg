@@ -222,7 +222,8 @@
     }
 
     /* Prefix match, not the exact id: the control renders as emailVerificationControlOpalOtp on
-       this page now (see signup.js), and an exact-id rule would leave "Change email" visible. */
+       this page now (see sel() in verify-signin.js), and an exact-id rule would leave
+       "Change email" visible. */
     #api [id^="emailVerificationControl"][id$="_but_change_claims"] {
       display: none !important;
     }
