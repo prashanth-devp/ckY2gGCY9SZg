@@ -1,15 +1,30 @@
 $(document).ready(function () {
     window.CONTENT.verifying_blurb = "";
 
+    // A B2C display control id prefixes every DOM id that control renders, so these ids move
+    // whenever a journey is repointed at a different control. Signup now renders
+    // emailVerificationControlOpalOtp (SendCode -> REST-SendEmailOTP.Verify, i.e. the Opal/ACS
+    // sender) where it used to render emailVerificationControl (AadSspr). Matching on the id
+    // prefix rather than the exact id - the same approach verify-signin.js takes - keeps this
+    // page working against either control, so reverting a journey needs no page change.
+    //
+    // The control's own root element is the only id with no underscore suffix; every child id the
+    // control renders has one, hence the :not() rather than a bare prefix match.
+    function control(suffix) {
+        return suffix
+            ? '[id^="emailVerificationControl"][id$="' + suffix + '"]'
+            : '[id^="emailVerificationControl"]:not([id*="_"])';
+    }
+
     const SELECTORS = {
         selfAsserted: '[data-name="SelfAsserted"]',
-        sendCodeButton: '#emailVerificationControl_but_send_code',
-        verifyCodeButton: '#emailVerificationControl_but_verify_code',
+        sendCodeButton: control('_but_send_code'),
+        verifyCodeButton: control('_but_verify_code'),
         verificationCodeField: '.verificationCode_li',
         emailField: '.email_li',
         introText: '.intro',
-        changeClaimsButton: '#emailVerificationControl_but_change_claims',
-        verificationControl: '#emailVerificationControl',
+        changeClaimsButton: control('_but_change_claims'),
+        verificationControl: control(''),
         verificationCodeLi: '.emailVerificationCode_li',
         verificationButtons: '#attributeVerification > .buttons',
         continueButton: 'continue',
