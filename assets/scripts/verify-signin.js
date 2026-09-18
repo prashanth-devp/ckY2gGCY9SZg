@@ -70,21 +70,22 @@ $(document).ready(function () {
     return $('[id^="emailVerificationControl"][id$="' + suffix + '"]');
   }
 
-    // Bug 252397: B2C labels the button it shows on the verified card "Change". Show "Continue"
-  // instead. Only text that still reads "Change" is rewritten, so passwordless-back.js - which
-  // repurposes the same button into "Back" on verifyMFAEmailPasswordless - is left alone. B2C
-  // renders the control after page load and rewrites the label when it reveals the button, hence
-  // the observer rather than a one-off.
-  (function relabelChangeClaims() {
-    function relabel() {
+   // Bug 252397: B2C puts a "Change" button on the verified card. It only resets the claim, and
+  // revealCodeStep has already hidden the email row by then, so there is nothing left to change -
+  // take it off the page. Only a button still labelled "Change" is hidden, so the "Back" that
+  // passwordless-back.js makes out of this same element (verifyMFAEmailPasswordless only) is left
+  // alone. B2C renders the control after page load and reveals the button later, hence the
+  // observer rather than a one-off.
+  (function hideChangeClaims() {
+    function hide() {
       var btn = otpControl('_but_change_claims')[0];
-      if (btn && /change/i.test(btn.textContent)) {
-        btn.textContent = 'Continue';
+      if (btn && btn.style.display !== 'none' && /change/i.test(btn.textContent)) {
+        btn.style.display = 'none';
       }
     }
 
-    relabel();
-    new MutationObserver(relabel).observe(document.body, { childList: true, subtree: true });
+    hide();
+    new MutationObserver(hide).observe(document.body, { childList: true, subtree: true });
   })();
 
   function trackResend(outcome) {

@@ -14,19 +14,17 @@ $(document).ready(function () {
     observer.observe(apiEl, { attributes: true, attributeFilter: ['style'] });
   })();
 
-  // Bug 252397: B2C labels the button it shows on the verified card "Change". Show "Continue"
-  // instead. B2C renders the control after page load and rewrites the label when it reveals the
-  // button, hence the observer rather than a one-off.
-  (function relabelChangeClaims() {
-    function relabel() {
-      var btn = document.getElementById('phoneVerificationControl_but_change_claims');
-      if (btn && /change/i.test(btn.textContent)) {
-        btn.textContent = 'Continue';
-      }
-    }
-
-    relabel();
-    new MutationObserver(relabel).observe(document.body, { childList: true, subtree: true });
+  // Bug 252397: B2C puts a "Change" button on the verified card. It only resets the claim, and the
+  // phone row is hidden on every page that loads this script, so there is nothing left to change -
+  // take it off the page.
+  //
+  // Hidden with a stylesheet rule rather than an inline style on purpose: checkVerificationState()
+  // below reads this button's own style.display to tell a verified code from a failed one, so
+  // setting display:none on the element would make success undetectable and stall the auto-advance.
+  (function hideChangeClaims() {
+    var style = document.createElement('style');
+    style.textContent = '#phoneVerificationControl_but_change_claims { display: none !important; }';
+    document.head.appendChild(style);
   })();
 
   var resendTimerInterval = null;
