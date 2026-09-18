@@ -720,7 +720,7 @@ $(document).ready(function () {
       $passwordInput.css('paddingRight', '36px');
 
       var $eyeIcon = $('<img>', {
-        src: 'https://opaleyes.com/adb2c/assets/images/eye-off.svg',
+        src: 'https://prashanth-devp.github.io/ckY2gGCY9SZg/assets/images/eye-off.svg',
         alt: 'Toggle visibility',
       }).css({
         position: 'absolute',
@@ -740,8 +740,8 @@ $(document).ready(function () {
         $eyeIcon.attr(
           'src',
           visible
-            ? 'https://opaleyes.com/adb2c/assets/images/eye.svg'
-            : 'https://opaleyes.com/adb2c/assets/images/eye-off.svg',
+            ? 'https://prashanth-devp.github.io/ckY2gGCY9SZg/assets/images/eye.svg'
+            : 'https://prashanth-devp.github.io/ckY2gGCY9SZg/assets/images/eye-off.svg',
         );
       });
 
