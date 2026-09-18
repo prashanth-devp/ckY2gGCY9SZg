@@ -13,9 +13,6 @@
           rel="stylesheet"
   />
   <link rel="stylesheet" href="https://prashanth-devp.github.io/ckY2gGCY9SZg/assets/css/common.css" />
-  <!-- Bug 252397: opts this page into verify-signin.js relabelling B2C's post-verification
-       "Change" button to "Continue" and wiring it to the real submit. -->
-  <script>window.OPAL_OTP_CONTINUE = true;</script>
   <script src="https://prashanth-devp.github.io/ckY2gGCY9SZg/assets/scripts/verify-signin.js" defer></script>
   <script src="https://prashanth-devp.github.io/ckY2gGCY9SZg/assets/scripts/back.js" defer></script>
   <script src="https://prashanth-devp.github.io/ckY2gGCY9SZg/assets/scripts/shared.js" defer></script>
@@ -253,13 +250,6 @@
     }
 
 
-    /* Bug 252397: B2C's post-verification "Change" button is repurposed into a working
-       "Continue" by verify-signin.js, which stamps data-opal-continue. Keep it hidden
-       until then, so "Change" is never on screen - not even while the verify request is
-       still in flight. */
-    #api [id$="_but_change_claims"]:not([data-opal-continue="true"]) {
-      display: none !important;
-    }
 
   </style>
 </head>

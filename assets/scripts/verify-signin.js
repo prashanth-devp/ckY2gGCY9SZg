@@ -70,135 +70,22 @@ $(document).ready(function () {
     return $('[id^="emailVerificationControl"][id$="' + suffix + '"]');
   }
 
-  // Bug 252397. Pages opt in with window.OPAL_OTP_CONTINUE. Left out: the passwordless pages,
-  // where passwordless-back.js repurposes this same button into "Back", and the sign-up / email
-  // change pages, which have a password step to move on to instead of a submit.
-  var OTP_CONTINUE_ENABLED = window.OPAL_OTP_CONTINUE === true;
-  var verifiedContinueSubmitted = false;
-
-  // B2C's own continue button sits in a button row these pages keep hidden
-  // (form#attributeVerification > .buttons), so it has to be revealed before the click.
-  function submitContinue() {
-    var continueBtn = document.getElementById('continue');
-    if (!continueBtn) return false;
-
-    $('#attributeVerification > .buttons').css('display', 'flex');
-    continueBtn.click();
-    return true;
-  }
-
-  // Once the code is verified B2C hides the code row and the verify button and reveals its own
-  // "Change" button, which is then the only button on the card. "Change" only resets the claim -
-  // and revealCodeStep has already hidden the email row, so there was never anything to change.
-  // Relabel it "Continue" and wire it to the real submit. The page CSS keeps the button hidden
-  // until data-opal-continue is stamped, so "Change" itself is never on screen.
-  function repurposeChangeClaimsToContinue() {
-    var btn = otpControl('_but_change_claims')[0];
-    if (!btn || btn.getAttribute('data-opal-continue') === 'true') return;
-
-    // Replace the node to strip B2C's own reset handler, keeping the id so B2C's show/hide
-    // styling still targets it.
-    var proceed = btn.cloneNode(true);
-    proceed.textContent = 'Continue';
-    proceed.setAttribute('data-opal-continue', 'true');
-    btn.parentNode.replaceChild(proceed, btn);
-
-    proceed.addEventListener('click', function (e) {
-      e.preventDefault();
-      submitContinue();
-    });
-  }
-
-  // Tolerant variant of waitForButtonEnabled, used only after the code is verified - where
-  // submitting is unambiguously the right thing to do. It accepts a missing aria-disabled
-  // attribute, which the strict === 'false' check in waitForButtonEnabled cannot: that one also
-  // feeds the page-load auto-submit paths, which must not fire on a form the user has not filled
-  // in yet. Resolves null rather than hanging.
-  function waitForContinueEnabled(timeoutMs) {
-    return new Promise(function (resolve) {
-      function enabled() {
-        var el = document.getElementById('continue');
-        if (!el) return null;
-        return el.getAttribute('aria-disabled') !== 'true' && !el.disabled ? el : null;
+    // Bug 252397: B2C labels the button it shows on the verified card "Change". Show "Continue"
+  // instead. Only text that still reads "Change" is rewritten, so passwordless-back.js - which
+  // repurposes the same button into "Back" on verifyMFAEmailPasswordless - is left alone. B2C
+  // renders the control after page load and rewrites the label when it reveals the button, hence
+  // the observer rather than a one-off.
+  (function relabelChangeClaims() {
+    function relabel() {
+      var btn = otpControl('_but_change_claims')[0];
+      if (btn && /change/i.test(btn.textContent)) {
+        btn.textContent = 'Continue';
       }
+    }
 
-      var immediate = enabled();
-      if (immediate) {
-        resolve(immediate);
-        return;
-      }
-
-      var settled = false;
-      function done(value) {
-        if (settled) return;
-        settled = true;
-        clearTimeout(timer);
-        observer.disconnect();
-        resolve(value);
-      }
-
-      var timer = setTimeout(function () { done(null); }, timeoutMs || 10000);
-      var observer = new MutationObserver(function () {
-        var button = enabled();
-        if (button) done(button);
-      });
-
-      observer.observe(document.body, {
-        childList: true,
-        subtree: true,
-        attributes: true,
-        attributeFilter: ['aria-disabled', 'disabled'],
-      });
-    });
-  }
-
-  // The MFA sign-in and MFA-setup pages have no password step, so goToPasswordStep had nothing to
-  // do and just returned. The only other thing that submits these pages is the one-shot
-  // waitForButtonEnabled('continue') near the bottom of this file, and that bails out whenever
-  // continue is already enabled while the code row is still on screen - then never re-arms. Which
-  // is why verification usually advanced but sometimes stranded the user on B2C's verified card
-  // with nothing but its "Change" button (bug 252397). Submit explicitly here instead.
-  function continueAfterVerification() {
-    if (!OTP_CONTINUE_ENABLED || verifiedContinueSubmitted) return;
-    verifiedContinueSubmitted = true;
-    emailVerificationConfirmed = true;
-
-    otpControl('_success_message').hide();
-    $('#otp-sent-at').remove();
-    $('#otp-resend-countdown').remove();
-    $('.verificationCode_li').addClass('none');
-    $(EMAIL.control).addClass('none');
-    $('.email_li').addClass('none');
-
-    waitForContinueEnabled(10000).then(function (button) {
-      // Never enabled - so the claim is not actually verified, or there is nothing to submit.
-      // Put the control back so the repurposed "Continue" is reachable rather than leaving an
-      // empty card behind, and allow a later attempt.
-      if (!button) {
-        verifiedContinueSubmitted = false;
-        $(EMAIL.control).removeClass('none');
-        $('.verificationCode_li').removeClass('none');
-        return;
-      }
-
-      submitContinue();
-
-      waitForElementVisible('#claimVerificationServerError').then(function () {
-        verifiedContinueSubmitted = false;
-        $('#api').show();
-        $(EMAIL.control).removeClass('none');
-        $('.verificationCode_li').removeClass('none');
-      });
-    });
-  }
-
-  if (OTP_CONTINUE_ENABLED) {
-    repurposeChangeClaimsToContinue();
-    new MutationObserver(repurposeChangeClaimsToContinue).observe(document.body, {
-      childList: true,
-      subtree: true,
-    });
-  }
+    relabel();
+    new MutationObserver(relabel).observe(document.body, { childList: true, subtree: true });
+  })();
 
   function trackResend(outcome) {
     window.dataLayer = window.dataLayer || [];

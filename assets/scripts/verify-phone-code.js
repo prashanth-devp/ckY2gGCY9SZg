@@ -1,10 +1,5 @@
 $(document).ready(function () {
-  // Guarded: this is the first statement on the page, so a missing window.CONTENT used to throw
-  // before a single handler was bound - leaving B2C's own control running unassisted, which is
-  // one of the ways the verified card ends up with nothing but "Change" on it (bug 252397).
-  if (window.CONTENT) {
-    window.CONTENT.verifying_blurb = '';
-  }
+  window.CONTENT.verifying_blurb = '';
 
   (function preventApiHide() {
     var apiEl = document.getElementById('api');
@@ -17,6 +12,21 @@ $(document).ready(function () {
     });
 
     observer.observe(apiEl, { attributes: true, attributeFilter: ['style'] });
+  })();
+
+  // Bug 252397: B2C labels the button it shows on the verified card "Change". Show "Continue"
+  // instead. B2C renders the control after page load and rewrites the label when it reveals the
+  // button, hence the observer rather than a one-off.
+  (function relabelChangeClaims() {
+    function relabel() {
+      var btn = document.getElementById('phoneVerificationControl_but_change_claims');
+      if (btn && /change/i.test(btn.textContent)) {
+        btn.textContent = 'Continue';
+      }
+    }
+
+    relabel();
+    new MutationObserver(relabel).observe(document.body, { childList: true, subtree: true });
   })();
 
   var resendTimerInterval = null;
@@ -88,33 +98,21 @@ $(document).ready(function () {
     });
   }
 
-  // Resolves the button once B2C enables it, or null after timeoutMs. The timeout matters: if
-  // this never resolves, the verify handler below stops half-way with the control already
-  // hidden, which is how users ended up on a card they could not get off (bug 252397).
-  function waitForButtonEnabled(buttonId, timeoutMs) {
+  function waitForButtonEnabled(buttonId) {
     return new Promise((resolve) => {
-      const isEnabled = (el) =>
-        el && el.getAttribute('aria-disabled') !== 'true' && !el.disabled;
+      const button = document.getElementById(buttonId);
 
-      if (isEnabled(document.getElementById(buttonId))) {
-        resolve(document.getElementById(buttonId));
+      if (button && button.getAttribute('aria-disabled') !== 'true' && !button.disabled) {
+        resolve(button);
         return;
       }
 
-      let settled = false;
-      const done = (value) => {
-        if (settled) return;
-        settled = true;
-        clearTimeout(timer);
-        observer.disconnect();
-        resolve(value);
-      };
-
-      const timer = setTimeout(() => done(null), timeoutMs || 10000);
-
-      const observer = new MutationObserver(() => {
+      const observer = new MutationObserver((mutations, obs) => {
         const button = document.getElementById(buttonId);
-        if (isEnabled(button)) done(button);
+        if (button && button.getAttribute('aria-disabled') !== 'true' && !button.disabled) {
+          obs.disconnect();
+          resolve(button);
+        }
       });
 
       observer.observe(document.body, {
@@ -126,52 +124,11 @@ $(document).ready(function () {
     });
   }
 
-  // Submits the page. B2C's own continue button sits in a button row these pages keep hidden
-  // (form#attributeVerification > .buttons), so it has to be revealed before the click.
-  function submitContinue() {
-    var continueBtn = document.getElementById('continue');
-    if (!continueBtn) return false;
-
-    $('#attributeVerification > .buttons').css('display', 'flex');
-    continueBtn.click();
-    return true;
-  }
-
-  // Bug 252397: once the code is verified B2C swaps the control over to a success message plus
-  // its own "Change" button and hides everything else, so "Change" is the only button on screen.
-  // It only resets the claim - and the phone row is hidden on every page that loads this script,
-  // so it never had anything to change. Relabel it "Continue" and wire it to the real submit, so
-  // the verified state always has a way forward even when the auto-advance below does not fire.
-  function repurposeChangeClaimsToContinue() {
-    var btn = document.getElementById('phoneVerificationControl_but_change_claims');
-    if (!btn || btn.getAttribute('data-opal-continue') === 'true') return;
-
-    // Replace the node to strip B2C's own reset handler, keeping the id so B2C's show/hide
-    // styling still targets it.
-    var proceed = btn.cloneNode(true);
-    proceed.textContent = 'Continue';
-    proceed.setAttribute('data-opal-continue', 'true');
-    btn.parentNode.replaceChild(proceed, btn);
-
-    proceed.addEventListener('click', function (e) {
-      e.preventDefault();
-      submitContinue();
-    });
-  }
-
-  (function keepChangeClaimsRepurposed() {
-    repurposeChangeClaimsToContinue();
-
-    var observer = new MutationObserver(repurposeChangeClaimsToContinue);
-    observer.observe(document.body, { childList: true, subtree: true });
-  })();
-
   $(document).on('click', '#phoneVerificationControl_but_send_code', async function () {
     await waitForElementVisible('.verificationCode_li');
 
     $('#api').show();
-    const introMessage =
-      window.SA_FIELDS?.AttributeFields?.[0]?.DISPLAY_CONTROL_CONTENT?.intro_msg;
+    const introMessage = window?.SA_FIELDS.AttributeFields[0]?.DISPLAY_CONTROL_CONTENT?.intro_msg;
     if (introMessage) {
       $('#api h1').text(introMessage);
     }
@@ -218,33 +175,32 @@ $(document).ready(function () {
     return null;
   }
 
-  // Deliberately no synchronous first read: this runs while B2C's verify request is still in
-  // flight, so the DOM still holds the *previous* attempt's state. Reading it straight away is
-  // what made a correct code entered after a wrong one resolve as 'error' (bug 252397) - the
-  // handler then returned early and left the user on B2C's verified card with only "Change" on
-  // it. Resolves 'timeout' rather than hanging if neither signal ever arrives.
-  function waitForVerificationResult(timeoutMs) {
+  function waitForVerificationResult() {
     return new Promise(function (resolve) {
-      var settled = false;
-
-      function done(value) {
-        if (settled) return;
-        settled = true;
-        clearInterval(pollInterval);
-        clearTimeout(timer);
-        observer.disconnect();
-        resolve(value);
+      var immediate = checkVerificationState();
+      if (immediate) {
+        resolve(immediate);
+        return;
       }
 
-      function check() {
+      var pollInterval = setInterval(function () {
         var result = checkVerificationState();
-        if (result) done(result);
-      }
+        if (result) {
+          clearInterval(pollInterval);
+          if (observer) observer.disconnect();
+          resolve(result);
+        }
+      }, 200);
 
-      var pollInterval = setInterval(check, 200);
-      var timer = setTimeout(function () { done('timeout'); }, timeoutMs || 20000);
+      var observer = new MutationObserver(function () {
+        var result = checkVerificationState();
+        if (result) {
+          clearInterval(pollInterval);
+          observer.disconnect();
+          resolve(result);
+        }
+      });
 
-      var observer = new MutationObserver(check);
       observer.observe(document.body, {
         childList: true,
         subtree: true,
@@ -260,53 +216,37 @@ $(document).ready(function () {
       return;
     }
 
-    // Drop the previous attempt's message so the poll below cannot mistake it for the result of
-    // this one. Only the text is cleared - B2C owns the element's visibility and rewrites the
-    // text on every response, so a genuine repeat error is still detected.
-    var staleError = document.getElementById('phoneVerificationControl_error_message');
-    if (staleError) {
-      staleError.textContent = '';
-    }
-
     var result = await waitForVerificationResult();
 
-    // 'timeout' means neither signal ever showed. Leave B2C's markup alone in both cases: the
-    // verified card carries the repurposed "Continue" button and an error card carries the code
-    // row, so either way the user has something to act on.
-    if (result !== 'success') {
+    if (result === 'error') {
       $('#phoneVerificationControl').removeClass('none');
-      $('.verificationCode_li').removeClass('none');
+      $('.phoneVerificationCode_li').removeClass('none');
       return;
     }
 
     $('#phoneVerificationControl_success_message').hide();
-    $('.verificationCode_li').addClass('none');
+    $('.phoneVerificationCode_li').addClass('none');
     $('#phoneVerificationControl').addClass('none');
     $('.phone_li').addClass('none');
 
-    var continueBtn = await waitForButtonEnabled('continue', 10000);
-
-    // Continue never came good (or this page has none). Put the control back so the repurposed
-    // "Continue" is reachable instead of leaving an empty card behind.
-    if (!continueBtn) {
-      $('#phoneVerificationControl').removeClass('none');
-      return;
+    var continueBtn = document.getElementById('continue');
+    if (continueBtn) {
+      await waitForButtonEnabled('continue');
+      await new Promise(function (r) { setTimeout(r, 1000); });
+      $('#attributeVerification > .buttons').css('display', 'flex');
+      continueBtn.click();
+      waitForElementVisible('#claimVerificationServerError').then(function () {
+        var $err = $('#claimVerificationServerError');
+        var errText = ($err.text() || '').toLowerCase();
+        if (errText.indexOf('already exists') !== -1 || errText.indexOf('specified id') !== -1) {
+          $err.text('An account already exists with this phone number.');
+        }
+        $('#api').show();
+        $('#phoneVerificationControl').removeClass('none');
+        $('.phoneVerificationCode_li').removeClass('none');
+        $('.phone_li').removeClass('none');
+      });
     }
-
-    await new Promise(function (r) { setTimeout(r, 1000); });
-    submitContinue();
-
-    waitForElementVisible('#claimVerificationServerError').then(function () {
-      var $err = $('#claimVerificationServerError');
-      var errText = ($err.text() || '').toLowerCase();
-      if (errText.indexOf('already exists') !== -1 || errText.indexOf('specified id') !== -1) {
-        $err.text('An account already exists with this phone number.');
-      }
-      $('#api').show();
-      $('#phoneVerificationControl').removeClass('none');
-      $('.verificationCode_li').removeClass('none');
-      $('.phone_li').removeClass('none');
-    });
   });
 
   // Resolves true once #phone has a value, false after a short timeout. On pages where the
