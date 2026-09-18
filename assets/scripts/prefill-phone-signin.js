@@ -94,14 +94,37 @@
     return text || "We couldn't send a verification code. Please try again.";
   }
 
+  function codeStepOnScreen() {
+    var codeLi = document.querySelector('.verificationCode_li');
+    return !!(codeLi && codeLi.offsetParent !== null);
+  }
+
+  // Bug 252397: the hand-off below is a send-stage safety net, but it fires on *any* visible
+  // error and answers with history.back(), which lands on the sign-in screen. Once the user has
+  // submitted a code, that turns a recoverable verify error into "I entered my OTP and got
+  // bounced back to login". Disarm on the verify click - it runs in the capture phase, so it
+  // beats both B2C's handler and whatever error that request comes back with.
+  document.addEventListener('click', function (e) {
+    var verifyBtn = document.getElementById('phoneVerificationControl_but_verify_code');
+    if (verifyBtn && (e.target === verifyBtn || verifyBtn.contains(e.target))) {
+      stopWatching();
+    }
+  }, true);
+
+  // This script is deferred, so the code step can already be up by the time it runs (a resumed
+  // page, a warm cache). Check once up front instead of waiting on a mutation that may not come.
+  if (codeStepOnScreen()) {
+    settled = true;
+    return;
+  }
+
   var observeConfig = { childList: true, subtree: true, attributes: true, attributeFilter: ['style', 'class'] };
 
   // A successful send reveals the code-entry row; once that happens the send
   // stage is over, so we stop watching (any later verify errors — wrong code,
   // account-not-found — stay on this page, as they should).
   successObserver = new MutationObserver(function () {
-    var codeLi = document.querySelector('.verificationCode_li');
-    if (codeLi && codeLi.offsetParent !== null) stopWatching();
+    if (codeStepOnScreen()) stopWatching();
   });
   successObserver.observe(document.body, observeConfig);
 
