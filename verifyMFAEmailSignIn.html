@@ -11,10 +11,13 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Rethink+Sans:ital,wght@0,400..800;1,400..800&display=swap"
     rel="stylesheet" />
-  <link rel="stylesheet" href="https://prashanth-devp.github.io/ckY2gGCY9SZg/assets/css/common.css" />
-  <script src="https://prashanth-devp.github.io/ckY2gGCY9SZg/assets/scripts/verify-signin.js" defer></script>
-  <script src="https://prashanth-devp.github.io/ckY2gGCY9SZg/assets/scripts/back.js" defer></script>
-  <script src="https://prashanth-devp.github.io/ckY2gGCY9SZg/assets/scripts/shared.js" defer></script>
+  <link rel="stylesheet" href="https://opaleyes.com/adb2c/assets/css/common.css" />
+  <!-- Bug 252397: opts this page into verify-signin.js relabelling B2C's post-verification
+       "Change" button to "Continue" and wiring it to the real submit. -->
+  <script>window.OPAL_OTP_CONTINUE = true;</script>
+  <script src="https://opaleyes.com/adb2c/assets/scripts/verify-signin.js" defer></script>
+  <script src="https://opaleyes.com/adb2c/assets/scripts/back.js" defer></script>
+  <script src="https://opaleyes.com/adb2c/assets/scripts/shared.js" defer></script>
   <style>
     body {
       margin: 0;
@@ -22,7 +25,7 @@
     }
 
     #opal-main {
-      background-image: url("https://prashanth-devp.github.io/ckY2gGCY9SZg/assets/images/landingBackground.png");
+      background-image: url("https://opaleyes.com/adb2c/assets/images/landingBackground.png");
       height: 100vh;
       background-size: cover;
       background-position: center;
@@ -287,13 +290,22 @@
       margin: 8px 0 4px;
       text-align: center;
     }
+
+    /* Bug 252397: B2C's post-verification "Change" button is repurposed into a working
+       "Continue" by verify-signin.js, which stamps data-opal-continue. Keep it hidden
+       until then, so "Change" is never on screen - not even while the verify request is
+       still in flight. */
+    #api [id$="_but_change_claims"]:not([data-opal-continue="true"]) {
+      display: none !important;
+    }
+
   </style>
 </head>
 
 <body>
   <div id="opal-main">
     <header>
-      <img src="https://prashanth-devp.github.io/ckY2gGCY9SZg/assets/images/logo.svg" alt="Logo" style="height: 1.5rem" />
+      <img src="https://opaleyes.com/adb2c/assets/images/logo.svg" alt="Logo" style="height: 1.5rem" />
     </header>
 
     <div class="p-4">
